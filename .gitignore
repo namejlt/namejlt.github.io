@@ -1,0 +1,11 @@
+# Hugo
+public/
+resources/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
