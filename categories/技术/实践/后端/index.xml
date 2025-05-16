@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/实践/后端 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/</link><description>Recent content in 技术/实践/后端 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 15 May 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>服务端通用，需要了解和掌握的知识&lt;/p>
+&lt;p>服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p>
+&lt;ul>
+&lt;li>高可用 - 冗余设计，容错处理，自动恢复&lt;/li>
+&lt;li>高并发 - 支持大量请求&lt;/li>
+&lt;li>高性能 - 快速处理单个请求，并减少资源消耗&lt;/li>
+&lt;/ul>
+&lt;p>很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p>
+&lt;ul>
+&lt;li>建立体系，从服务底层到业务层，了解各层面做什么，如何协调工作&lt;/li>
+&lt;li>软件基础原理：操作系统、数据结构、数据库&lt;/li>
+&lt;li>软件设计原理：设计思想、模式&lt;/li>
+&lt;li>架构核心原理：原则&lt;/li>
+&lt;/ul>
+&lt;h2 id="程序运行">程序运行&lt;/h2>
+&lt;p>基于操作系统，跑在硬件上，冯诺依曼结构的硬件体系&lt;/p>
+&lt;p>进程维度，跑在内存中，通过cpu进行计算处理逻辑，对外部设备进行io数据交换&lt;/p>
+&lt;p>可执行程序，会执行成为进程&lt;/p>
+&lt;p>&lt;figure>
+&lt;picture>
+&lt;img
+loading="lazy"
+decoding="async"
+alt="process"
+class="image_figure image_internal image_unprocessed"
+src="https://namejlt.github.io/imgs/tech/practice/backend/process.jpg"
+/>
+&lt;/picture>
+&lt;/figure>
+&lt;/p>
+&lt;p>进程包含：使用内存和cpu，内存中包含各个区间，可执行代码、堆、栈、进程数据结构&lt;/p>
+&lt;p>进程是一个死循环，从入口开始，跑各种各样的函数，跳转，会操作堆内存&lt;/p>
+&lt;p>计算机同时处理很多任务，cpu分时共享技术&lt;/p>
+&lt;p>所以进程每个都是轮流占用时间片，有调度策略&lt;/p>
+&lt;p>进程状态：&lt;/p>
+&lt;p>运行，正在cpu上运行&lt;/p>
+&lt;p>就绪，拿到除cpu外所有资源，等待cpu&lt;/p>
+&lt;p>阻塞，因其他资源等待，让出cpu，睡眠等待其他资源成功&lt;/p>
+&lt;p>进程切换消耗大，实际使用线程来占用cpu&lt;/p>
+&lt;p>go使用协程，更低的降低线程切换消耗&lt;/p>
+&lt;p>请求变慢，因为资源有限(内存、cpu、网络)，等待，阻塞&lt;/p>
+&lt;p>阻塞越多，资源卡住，达到系统极限，系统会宕机，应用崩溃&lt;/p>
+&lt;p>解决阻塞，就是资源变多，分布式架构，多副本&lt;/p>
+&lt;p>请求减少，限流，应用消耗减低，降级&lt;/p>
+&lt;p>并发锁的核心&lt;/p>
+&lt;ul>
+&lt;li>编程语言互斥锁&lt;/li>
+&lt;li>原子操作，信号量cas，封装各种类型cpu&lt;/li>
+&lt;li>CPU部分指令 cas，这里现代cpu都包含总线锁，多核cpu保证读写一致&lt;/li>
+&lt;/ul>
+&lt;h2 id="数据结构">数据结构&lt;/h2>
+&lt;p>数组，连续有序内存，相同类型结构&lt;/p>
+&lt;p>因为连续，知道下标，可以o（1）找到位置&lt;/p>
+&lt;p>不知道下标，知道值，需要o(N)&lt;/p>
+&lt;p>链表，地址链接的内存，可能不连续&lt;/p>
+&lt;p>因为不连续，查找需要遍历，所以o（N）&lt;/p>
+&lt;p>为了优化查询，插入，删除，异化了链表，各种树就出来了，有序的链表&lt;/p>
+&lt;p>hash表，底层是数组&lt;/p>
+&lt;p>下标通过hash函数获取，查找o（1）&lt;/p>
+&lt;p>哈希冲突，一般链地址法解决，多保存几个值，go的map这样做&lt;/p>
+&lt;p>栈，先进后出&lt;/p>
+&lt;p>函数用这个，函数的调用，管理工作区的数据&lt;/p>
+&lt;p>可以数组，也可以链表实现&lt;/p>
+&lt;p>队列，先进先出&lt;/p>
+&lt;p>排队的任务处理&lt;/p>
+&lt;p>树&lt;/p>
+&lt;p>数组、链表、栈、队列都是线性表，每个元素一个前驱，一个后继&lt;/p>
+&lt;p>树是非线性的，一个元素可以多个前驱，多个后继&lt;/p>
+&lt;h2 id="java虚拟机跨平台">java虚拟机跨平台&lt;/h2>
+&lt;p>java如何跨平台，因为虚拟机，封装了多平台实现，不同cpu指令&lt;/p>
+&lt;p>屏蔽底层不一样的东西&lt;/p>
+&lt;p>jvm&lt;/p>
+&lt;p>&lt;figure>
+&lt;picture>
+&lt;img
+loading="lazy"
+decoding="async"
+alt="jvm"
+class="image_figure image_internal image_unprocessed"
+src="https://namejlt.github.io/imgs/tech/practice/backend/jvm.jpg"
+/>
+&lt;/picture>
+&lt;/figure>
+&lt;/p>
+&lt;p>JVM，它封装了⼀组⾃定义的字节码指令集，有⾃⼰的程序计数器和执⾏引&lt;/p></description></item></channel></rss>
