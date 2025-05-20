@@ -1,4 +1,114 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/AI/应用开发 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/</link><description>Recent content in 技术/AI/应用开发 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 15 May 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/AI/应用开发 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/</link><description>Recent content in 技术/AI/应用开发 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 20 May 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p>
+&lt;p>未来MCP（多智能体协作协议）将成为未来AI应用开发的核心技术。通过Function Calling机制，智能体可以调用外部工具，但是没有定义如何去调用，MCP就是规范了这个调用外部工具的协议。&lt;/p>
+&lt;p>应用开发基本也解决了大模型的几个薄弱点，包括：&lt;/p>
+&lt;ul>
+&lt;li>上下文记忆能力&lt;/li>
+&lt;li>最新信息获取能力&lt;/li>
+&lt;li>专业领域知识能力&lt;/li>
+&lt;/ul>
+&lt;p>2025年，AI应用开发趋势主要是agent开发，更适应环境的agent。&lt;/p>
+&lt;h2 id="零大模型历史和定义">零、大模型历史和定义&lt;/h2>
+&lt;h3 id="大模型的历史发展">大模型的历史发展&lt;/h3>
+&lt;h4 id="1-早期基础2017年之前">1. 早期基础（2017年之前）&lt;/h4>
+&lt;ul>
+&lt;li>传统神经网络时代&lt;/li>
+&lt;li>Word2Vec、GloVe等词向量模型&lt;/li>
+&lt;li>注意力机制的提出&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-transformer革命2017">2. Transformer革命（2017）&lt;/h4>
+&lt;ul>
+&lt;li>Google发布Transformer架构论文&lt;/li>
+&lt;li>自注意力机制带来突破性进展&lt;/li>
+&lt;li>为大规模语言模型奠定基础&lt;/li>
+&lt;/ul>
+&lt;h4 id="3-预训练模型时代2018-2019">3. 预训练模型时代（2018-2019）&lt;/h4>
+&lt;ul>
+&lt;li>BERT的出现开启预训练时代&lt;/li>
+&lt;li>GPT-1展示生成式模型潜力&lt;/li>
+&lt;li>RoBERTa等模型不断优化性能&lt;/li>
+&lt;/ul>
+&lt;h4 id="4-规模化时代2020-2022">4. 规模化时代（2020-2022）&lt;/h4>
+&lt;ul>
+&lt;li>GPT-3展示大规模语言模型能力&lt;/li>
+&lt;li>PaLM、BLOOM等超大规模模型涌现&lt;/li>
+&lt;li>中文模型百川、文心等快速发展&lt;/li>
+&lt;/ul>
+&lt;h4 id="5-多模态融合时代2022至今">5. 多模态融合时代（2022至今）&lt;/h4>
+&lt;ul>
+&lt;li>GPT-4开启多模态理解新纪元&lt;/li>
+&lt;li>Claude等展示更强的推理能力&lt;/li>
+&lt;li>国内外大模型百花齐放&lt;/li>
+&lt;/ul>
+&lt;h3 id="大模型的定义">大模型的定义&lt;/h3>
+&lt;h4 id="核心特征">核心特征&lt;/h4>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>规模巨大&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>参数量通常在十亿级以上(人脑250万亿)&lt;/li>
+&lt;li>训练数据规模庞大&lt;/li>
+&lt;li>计算资源需求高&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>架构特点&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>基于Transformer架构&lt;/li>
+&lt;li>采用自注意力机制&lt;/li>
+&lt;li>多层深度神经网络&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>能力表现&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>强大的自然语言理解能力&lt;/li>
+&lt;li>上下文学习能力&lt;/li>
+&lt;li>零样本/少样本学习能力&lt;/li>
+&lt;li>指令跟随能力&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="主要类型">主要类型&lt;/h4>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>基础模型&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>通用知识储备&lt;/li>
+&lt;li>基础语言理解能力&lt;/li>
+&lt;li>作为下游任务基础&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>领域专用模型&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>特定领域知识深化&lt;/li>
+&lt;li>专业任务优化&lt;/li>
+&lt;li>垂直场景应用&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>多模态模型&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>文本、图像理解&lt;/li>
+&lt;li>跨模态转换能力&lt;/li>
+&lt;li>多模态协同推理&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="应用特点">应用特点&lt;/h4>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>通用性&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>适应多种任务场景&lt;/li>
+&lt;li>迁移学习能力强&lt;/li>
+&lt;li>知识泛化能力好&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>可扩展性&lt;/strong>&lt;/p></description></item><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
 &lt;h2 id="概述">概述&lt;/h2>
 &lt;p>AI应用开发是一项复杂的任务，需要深入理解人工智能的原理和应用。以下是学习步骤，帮助您入门AI应用开发。&lt;/p>
 &lt;p>在之后的篇章中，会从概念到实战，逐步引导您掌握AI应用开发的各个方面。&lt;/p>
