@@ -567,8 +567,8 @@ import os
 # 初始化日志和 DashScope API Key
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-dashscope.api_key = "sk-378c651d6bfd41808ed6db0be33e5f2b"
-AMAP_API_KEY = os.getenv("AMAP_API_KEY", "5e27bb5d7efc223abe757a08b9d01e0c")
+dashscope.api_key = "sk-xxx"
+AMAP_API_KEY = os.getenv("AMAP_API_KEY", "xxx")
 amap_api_key = AMAP_API_KEY
 
 
