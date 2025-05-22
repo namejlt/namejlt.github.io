@@ -1,4 +1,194 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on LX 知识库</title><link>https://namejlt.github.io/posts/</link><description>Recent content in Posts on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 20 May 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on LX 知识库</title><link>https://namejlt.github.io/posts/</link><description>Recent content in Posts on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 22 May 2025 16:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 应用开发-002 PROMPT 提示词</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</link><pubDate>Thu, 22 May 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</guid><description>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>Prompt工程是AI应用开发中的关键技术，它关注如何通过优化提示词来提升AI模型的输出质量。本文将从原理、关键原则到实战技巧，全面介绍Prompt工程。&lt;/p>
+&lt;p>通用大模型，需要prompt优化；推理模型，仅需信任大模型，简洁指令聚焦目标即可，这里主要讨论通用大模型的prompt优化。&lt;/p>
+&lt;p>大模型相当于一个拥有很多知识的人，掌握好提问，才能让大模型更好的理解你的意图，得到想要的结果，学会有个格式的提问，就是prompt的核心。&lt;/p>
+&lt;p>prompt 是输入给 AI 模型的指令或提示，它包含了任务描述、上下文、示例等信息。通过合理设计和优化 prompt，可以提升 AI 模型的输出质量。&lt;/p>
+&lt;h2 id="一prompt工程原理">一、Prompt工程原理&lt;/h2>
+&lt;h3 id="1-基本概念">1. 基本概念&lt;/h3>
+&lt;ul>
+&lt;li>Prompt是输入给AI模型的指令或提示&lt;/li>
+&lt;li>包含任务描述、上下文、示例等信息&lt;/li>
+&lt;li>决定模型理解和执行任务的方式&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-工作机制">2. 工作机制&lt;/h3>
+&lt;ul>
+&lt;li>模型基于Prompt进行上下文理解&lt;/li>
+&lt;li>通过注意力机制处理关键信息&lt;/li>
+&lt;li>生成符合要求的输出内容&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-影响因素">3. 影响因素&lt;/h3>
+&lt;ul>
+&lt;li>提示词的清晰度和具体性&lt;/li>
+&lt;li>任务描述的完整性&lt;/li>
+&lt;li>示例的质量和相关性&lt;/li>
+&lt;li>上下文信息的充分性&lt;/li>
+&lt;/ul>
+&lt;h2 id="二提示词关键原则">二、提示词关键原则&lt;/h2>
+&lt;h3 id="1-明确性原则">1. 明确性原则&lt;/h3>
+&lt;ul>
+&lt;li>使用清晰、无歧义的语言&lt;/li>
+&lt;li>明确说明任务目标和要求&lt;/li>
+&lt;li>提供具体的输出格式指导&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-结构化原则">2. 结构化原则&lt;/h3>
+&lt;ul>
+&lt;li>合理组织提示词结构&lt;/li>
+&lt;li>分步骤描述复杂任务&lt;/li>
+&lt;li>保持逻辑顺序和层次&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-相关性原则">3. 相关性原则&lt;/h3>
+&lt;ul>
+&lt;li>提供相关的背景信息&lt;/li>
+&lt;li>包含必要的领域知识&lt;/li>
+&lt;li>避免无关信息干扰&lt;/li>
+&lt;/ul>
+&lt;h3 id="4-可控性原则">4. 可控性原则&lt;/h3>
+&lt;ul>
+&lt;li>设置适当的约束条件&lt;/li>
+&lt;li>定义清晰的输出范围&lt;/li>
+&lt;li>提供错误处理指导&lt;/li>
+&lt;/ul>
+&lt;h3 id="5-迭代优化原则">5. 迭代优化原则&lt;/h3>
+&lt;ul>
+&lt;li>持续优化和迭代&lt;/li>
+&lt;li>根据输出结果进行调整&lt;/li>
+&lt;/ul>
+&lt;h2 id="三提示词编写框架">三、提示词编写框架&lt;/h2>
+&lt;p>优先级：&lt;/p>
+&lt;p>任务 &amp;gt; 上下文 &amp;gt; 示例 &amp;gt; 角色 &amp;gt; 格式 &amp;gt; 语气&lt;/p>
+&lt;h3 id="1-任务定义最重要">1. 任务定义（最重要）&lt;/h3>
+&lt;ul>
+&lt;li>明确说明任务类型&lt;/li>
+&lt;li>定义具体目标&lt;/li>
+&lt;li>设置成功标准&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-角色设定">2. 角色设定&lt;/h3>
+&lt;ul>
+&lt;li>指定模型扮演的角色&lt;/li>
+&lt;li>定义专业背景&lt;/li>
+&lt;li>设置行为准则&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-输出规范">3. 输出规范&lt;/h3>
+&lt;ul>
+&lt;li>指定输出格式&lt;/li>
+&lt;li>定义质量标准&lt;/li>
+&lt;li>设置长度限制&lt;/li>
+&lt;/ul>
+&lt;h3 id="4-上下文提供">4. 上下文提供&lt;/h3>
+&lt;ul>
+&lt;li>补充背景信息&lt;/li>
+&lt;li>提供参考资料&lt;/li>
+&lt;li>说明限制条件&lt;/li>
+&lt;/ul>
+&lt;h3 id="5-示例展示">5. 示例展示&lt;/h3>
+&lt;ul>
+&lt;li>提供优质示例&lt;/li>
+&lt;li>说明关键要点&lt;/li>
+&lt;li>展示最佳实践&lt;/li>
+&lt;/ul>
+&lt;h3 id="6-语气">6. 语气&lt;/h3>
+&lt;ul>
+&lt;li>输出风格&lt;/li>
+&lt;li>语气语调&lt;/li>
+&lt;li>避免过度表达&lt;/li>
+&lt;/ul>
+&lt;h2 id="四提示词编写技巧">四、提示词编写技巧&lt;/h2>
+&lt;h3 id="1-格式限制技巧">1. 格式限制技巧&lt;/h3>
+&lt;ul>
+&lt;li>使用模板结构&lt;/li>
+&lt;li>设定固定格式&lt;/li>
+&lt;li>明确分隔符号&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-区分技巧">2. 区分技巧&lt;/h3>
+&lt;ul>
+&lt;li>使用明确的标记&lt;/li>
+&lt;li>设置清晰的边界&lt;/li>
+&lt;li>避免混淆歧义&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-小样本学习few-shot-learning">3. 小样本学习（Few-shot Learning）&lt;/h3>
+&lt;ul>
+&lt;li>提供相关示例&lt;/li>
+&lt;li>展示输入输出对&lt;/li>
+&lt;li>说明关键模式&lt;/li>
+&lt;/ul>
+&lt;h3 id="4-思维链chain-of-thought">4. 思维链（Chain of Thought）&lt;/h3>
+&lt;ul>
+&lt;li>引导逐步思考&lt;/li>
+&lt;li>展示推理过程&lt;/li>
+&lt;li>确保逻辑性&lt;/li>
+&lt;/ul>
+&lt;h3 id="5-角色扮演技巧">5. 角色扮演技巧&lt;/h3>
+&lt;ul>
+&lt;li>设定专业角色&lt;/li>
+&lt;li>定义行为准则&lt;/li>
+&lt;li>保持角色一致&lt;/li>
+&lt;/ul>
+&lt;h2 id="五prompt工程实战">五、Prompt工程实战&lt;/h2>
+&lt;h3 id="1-文本生成优化">1. 文本生成优化&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化前&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;写一篇关于AI的文章&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化后&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">角色：你是一位专业的科技记者
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">任务：写一篇关于AI发展的文章
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">要求：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">1. 篇幅1000字左右
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">2. 包含最新技术进展
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">3. 重点关注实际应用
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">4. 使用通俗易懂的语言
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">格式：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 标题
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 导语
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 正文（分3-4个部分）
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 总结
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="2-代码生成优化">2. 代码生成优化&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化前&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;写一个排序函数&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化后&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">角色：专业Python开发工程师
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">任务：实现一个高效的排序函数
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">要求：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">1. 使用Python语言
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">2. 支持数字和字符串排序
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">3. 包含参数类型检查
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">4. 添加详细注释
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">输出格式：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">1. 函数定义
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">2. 参数说明
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">3. 示例用法
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">4. 性能分析
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="3-数据分析优化">3. 数据分析优化&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化前&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;分析这些销售数据&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># 优化后&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>prompt &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">角色：数据分析专家
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">任务：分析月度销售数据
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">输入数据：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 产品销量
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 销售金额
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">- 客户分布
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">分析要求：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">1. 计算关键指标
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">2. 识别销售趋势
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">3. 提供改进建议
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">输出格式：
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">1. 数据概览
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">2. 详细分析
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">3. 可视化建议
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">4. 行动建议
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e6db74">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="总结">总结&lt;/h2>
+&lt;p>Prompt工程是AI应用开发中的关键环节，通过合理的设计和优化可以显著提升模型输出质量。核心要点包括：&lt;/p></description></item><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
 &lt;h2 id="概述">概述&lt;/h2>
 &lt;p>AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p>
 &lt;p>未来MCP（多智能体协作协议）将成为未来AI应用开发的核心技术。通过Function Calling机制，智能体可以调用外部工具，但是没有定义如何去调用，MCP就是规范了这个调用外部工具的协议。&lt;/p>
