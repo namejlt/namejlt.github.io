@@ -2,6 +2,7 @@
 title: "AI 应用开发入门指南"
 date: 2025-05-15T09:00:00+08:00
 draft: false
+toc: true
 categories: ["技术/AI/应用开发"]
 tags: ["AI", "应用开发"]
 ---

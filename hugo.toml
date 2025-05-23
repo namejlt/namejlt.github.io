@@ -2,3 +2,38 @@ baseURL = 'https://namejlt.github.io/'
 languageCode = 'zh-CN'
 title = 'LX 知识库'
 theme = "clarity"
+
+# 语言设置
+defaultContentLanguage = "zh"  # 中文
+hasCJKLanguage = true  # 启用中日韩文字排版优化
+
+# 代码高亮
+[markup.highlight]
+  style = "monokai"  # 代码高亮主题 可选：dracula, solarized-dark, github 等
+  lineNos = true     # 显示行号
+  lineNumbersInTable = false  # 行号独立显示
+
+[params]
+  font = "Inter"  # 可选：Inter, Roboto, Open Sans 等
+  codeFont = "Fira Code"  # 代码字体
+  darkMode = true  # 启用深色模式
+  darkModeToggle = true  # 显示切换按钮
+  googleAnalytics = "G-E7FWB5KMBF"
+
+[[params.social]]
+  name = "GitHub"
+  icon = "fab fa-github"
+  url = "https://github.com/namejlt"
+
+# 菜单配置
+[[menu.main]]
+  identifier = "posts"
+  name = "文章"
+  url = "/posts/"
+  weight = 1
+
+[[menu.main]]
+  identifier = "tags"
+  name = "标签"
+  url = "/tags/"
+  weight = 2

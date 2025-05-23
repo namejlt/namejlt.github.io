@@ -2,6 +2,7 @@
 title: "hugo源码阅读开篇"
 date: 2025-05-16T09:00:00+08:00
 draft: false
+toc: true
 categories: ["技术/源码阅读/hugo"]
 tags: ["源码阅读", "hugo"]
 ---

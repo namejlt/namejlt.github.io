@@ -2,6 +2,7 @@
 title: "AI 笔记-本地大模型部署"
 date: 2025-05-22T18:00:00+08:00
 draft: false
+toc: true
 categories: ["技术/AI/笔记"]
 tags: ["AI", "大模型"]
 ---
