@@ -2,6 +2,7 @@ baseURL = 'https://namejlt.github.io/'
 languageCode = 'zh-CN'
 title = 'LX 知识库'
 theme = "clarity"
+googleAnalytics = "G-E7FWB5KMBF"
 
 # 语言设置
 defaultContentLanguage = "zh"  # 中文
@@ -18,7 +19,6 @@ hasCJKLanguage = true  # 启用中日韩文字排版优化
   codeFont = "Fira Code"  # 代码字体
   darkMode = true  # 启用深色模式
   darkModeToggle = true  # 显示切换按钮
-  googleAnalytics = "G-E7FWB5KMBF"
 
 [[params.social]]
   name = "GitHub"
