@@ -17,11 +17,11 @@ const goBackClass = 'button_back';
 const lineClass = '.line';
 
 // defined in i18n / translation files
-const quickLinks = 'Results';
-const searchResultsLabel = 'Search Results';
-const shortSearchQuery = 'Query is too short'
-const typeToSearch = 'Type to search';
-const noMatchesFound = 'No results found';
+const quickLinks = '搜索到的结果';
+const searchResultsLabel = '搜索到的结果';
+const shortSearchQuery = '搜索字符太短'
+const typeToSearch = '请输入内容查找';
+const noMatchesFound = '未找到结果';
 
 ;
 // global variables
@@ -985,8 +985,12 @@ function fileClosure(){
   })();
 
   (function navToggle() {
+    elems('.nav_parent').forEach((link) => link.addEventListener('mouseenter', function(event) {
+      event.target.children[0].classList.add('nav_open')
+    }));
+
     elems('.nav_parent').forEach((link) => link.addEventListener('mouseleave', function(event) {
-      modifyClass(event.target.children[0], 'nav_open');
+      event.target.children[0].classList.remove('nav_open')
     }));
 
     doc.addEventListener('click', function(event){
