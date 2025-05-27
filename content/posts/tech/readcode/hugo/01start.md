@@ -1,5 +1,5 @@
 ---
-title: "hugo源码阅读开篇"
+title: "hugo源码阅读-01 开篇"
 date: 2025-05-16T09:00:00+08:00
 draft: false
 toc: true
