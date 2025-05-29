@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>阅读/笔记/问题 on LX 知识库</title><link>https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/</link><description>Recent content in 阅读/笔记/问题 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 29 May 2025 15:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/index.xml" rel="self" type="application/rss+xml"/><item><title>任天堂NES象棋游戏AI设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</link><pubDate>Thu, 29 May 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</guid><description>
+&lt;h2 id="问题">问题&lt;/h2>
+&lt;p>早期任天堂nes棋类游戏有电脑选项，它们的硬件限制相当苛刻，程序员是如何实现简单难度、中等难度、高等难度的，采用什么算法，具体如何实现？&lt;/p>
+&lt;h2 id="回答">回答&lt;/h2>
+&lt;p>在任天堂NES的棋类游戏中，电脑AI的设计需在硬件限制下实现高效决策。以象棋游戏为例，其核心原理涉及规则编码、搜索算法优化和评估函数设计，以下从技术实现角度展开分析。&lt;/p></description></item></channel></rss>
