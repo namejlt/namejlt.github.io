@@ -3,10 +3,18 @@
 &lt;p>早期任天堂nes棋类游戏有电脑选项，它们的硬件限制相当苛刻，程序员是如何实现简单难度、中等难度、高等难度的，采用什么算法，具体如何实现？&lt;/p>
 &lt;h2 id="回答">回答&lt;/h2>
 &lt;p>在任天堂NES的棋类游戏中，电脑AI的设计需在硬件限制下实现高效决策。以象棋游戏为例，其核心原理涉及规则编码、搜索算法优化和评估函数设计，以下从技术实现角度展开分析。&lt;/p></description></item><item><title>deepwiki源码阅读-04 修改验证</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</link><pubDate>Tue, 27 May 2025 18:40:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</guid><description>
-&lt;p>deepwiki&lt;/p></description></item><item><title>deepwiki源码阅读-03 核心逻辑分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</link><pubDate>Tue, 27 May 2025 18:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</guid><description>
-&lt;p>deepwiki&lt;/p></description></item><item><title>deepwiki源码阅读-02 项目整体分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</link><pubDate>Tue, 27 May 2025 18:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</guid><description>
-&lt;p>deepwiki&lt;/p></description></item><item><title>deepwiki源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</link><pubDate>Tue, 27 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</guid><description>
-&lt;h1 id="deepwiki-源码阅读开篇整体架构与核心特性梳理">DeepWiki 源码阅读开篇：整体架构与核心特性梳理&lt;/h1>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>deepwiki通过wiki生成和wiki展示的方式，把代码仓库的内容展示给用户。&lt;/p>
+&lt;p>我们可以扩展wiki生成的部分&lt;/p>
+&lt;ul>
+&lt;li>让其更加方便的支持各种大模型&lt;/li>
+&lt;li>wiki生成可以自定义结构&lt;/li>
+&lt;/ul>
+&lt;p>我们也可以更改此自动生成wiki的方式，生成其他内容，如爬取一定格式资料，生成内容分析&lt;/p></description></item><item><title>deepwiki源码阅读-03 核心逻辑分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</link><pubDate>Tue, 27 May 2025 18:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</guid><description>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>项目主要是把代码仓库拉到本地，进行代码ebedding，然后用向量数据库存储，然后用LLM进行文档生成，最后前端通过图标和结构化wiki展示。&lt;/p></description></item><item><title>deepwiki源码阅读-02 项目整体分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</link><pubDate>Tue, 27 May 2025 18:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</guid><description>
+&lt;h2 id="概述">概述&lt;/h2>
+&lt;p>在本篇文章中，我们将对 deepwiki 项目的整体架构进行系统性梳理，深入分析各层架构的设计思路与实现逻辑，剖析核心代码，并对项目进行总结，帮助读者快速把握其技术精髓。&lt;/p></description></item><item><title>deepwiki源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</link><pubDate>Tue, 27 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</guid><description>
 &lt;p>DeepWiki 是一个面向现代开发者的 AI 驱动文档生成系统，能够自动为 GitHub、GitLab、BitBucket 等代码仓库生成结构化、交互式的 Wiki 文档。其核心目标是通过多模型 AI 集成与 RAG（检索增强生成）技术，实现对私有/公开仓库的深度分析、知识问答与可视化文档输出。以下是对 DeepWiki 系统的整体介绍与关键特性梳理，便于后续源码阅读与深入理解。&lt;/p></description></item><item><title>AI 应用开发-003 AI辅助编程工具 cursor</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</link><pubDate>Sun, 25 May 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</guid><description>
 &lt;h2 id="概述">概述&lt;/h2>
 &lt;p>AI编程工具正经历从&amp;quot;代码补全&amp;quot;到&amp;quot;全局智能协作&amp;quot;的飞跃。Cursor作为新一代AI驱动的代码编辑器，集成了多模型、全局索引、自然语言编辑、规则驱动等创新能力，成为开发者高效协作与创新的强力引擎。&lt;/p></description></item><item><title>AI 笔记-本地大模型部署</title><link>https://namejlt.github.io/posts/tech/ai/note/local-llm/</link><pubDate>Thu, 22 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/local-llm/</guid><description>
