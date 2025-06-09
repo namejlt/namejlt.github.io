@@ -7,8 +7,6 @@ categories: ["技术/源码阅读/deepwiki"]
 tags: ["源码阅读", "deepwiki"]
 ---
 
-# DeepWiki 源码阅读开篇：整体架构与核心特性梳理
-
 DeepWiki 是一个面向现代开发者的 AI 驱动文档生成系统，能够自动为 GitHub、GitLab、BitBucket 等代码仓库生成结构化、交互式的 Wiki 文档。其核心目标是通过多模型 AI 集成与 RAG（检索增强生成）技术，实现对私有/公开仓库的深度分析、知识问答与可视化文档输出。以下是对 DeepWiki 系统的整体介绍与关键特性梳理，便于后续源码阅读与深入理解。
 
 ---

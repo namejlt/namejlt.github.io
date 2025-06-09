@@ -19,6 +19,7 @@ hasCJKLanguage = true  # 启用中日韩文字排版优化
   codeFont = "Fira Code"  # 代码字体
   darkMode = true  # 启用深色模式
   darkModeToggle = true  # 显示切换按钮
+  enableCodeLineNumbers = false
 
 [[params.social]]
   name = "GitHub"
