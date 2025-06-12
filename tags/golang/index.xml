@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Golang on LX 知识库</title><link>https://namejlt.github.io/tags/golang/</link><description>Recent content in Golang on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 12 Jun 2025 16:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml"/><item><title>如何快速实现一个小型数据库</title><link>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</link><pubDate>Thu, 12 Jun 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</guid><description>
+&lt;h2 id="问题">问题&lt;/h2>
+&lt;p>数据库用来存储和查询数据，现在有很多种类的数据，提供各种各样的数据存储和查询，分别适用各种不同场景，一个最简单的acid的数据库如何实现？&lt;/p>
+&lt;h2 id="回答">回答&lt;/h2>
+&lt;p>ACID 是数据库事务的四个基本特性，是确保数据一致性和可靠性的关键标准：&lt;/p></description></item></channel></rss>
