@@ -95,7 +95,7 @@ splitter = TextSplitter(**configs["text_splitter"])
 RAG 核心类 ( RAG ) ：
 
 - 继承自 adal.Component 。
-- 初始化 ( __init__ ) ：
+- 初始化 ( **init** ) ：
   - 设置模型提供者（ google 、 openai 、 openrouter 、 ollama ）和模型名称。
   - 判断是否使用 Ollama 嵌入器。
   - 初始化 Memory 实例来管理对话历史。
