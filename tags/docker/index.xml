@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on LX 知识库</title><link>https://namejlt.github.io/tags/docker/</link><description>Recent content in Docker on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 26 Jun 2025 17:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>golang应用是否有必要在docker容器中运行</title><link>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</link><pubDate>Thu, 26 Jun 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</guid><description>
+&lt;h2 id="问题">问题&lt;/h2>
+&lt;p>golang应用是否有必要在docker容器中运行？&lt;/p>
+&lt;h2 id="回答">回答&lt;/h2>
+&lt;p>对于Go（又称Golang）开发者而言，一个常见的问题是：是否真的有必要将应用放置在Docker容器中运行？Go语言以其静态编译、无外部依赖的特性著称，生成的可执行文件本身就具备了良好的移植性。那么，再套上一层Docker，究竟是锦上添花，还是多此一举？&lt;/p></description></item></channel></rss>
