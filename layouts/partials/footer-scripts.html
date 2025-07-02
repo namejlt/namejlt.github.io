@@ -9,3 +9,13 @@
     }
   });
 </script>
+
+{{ if hugo.IsDevelopment }}
+<script type="module">
+  import { initToolbar } from '/@stagewise/toolbar/dist/esm/index.js'; // Adjust this path based on your setup
+
+  initToolbar({
+    plugins: [],
+  });
+</script>
+{{ end }}
