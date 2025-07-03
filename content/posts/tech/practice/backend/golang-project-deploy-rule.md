@@ -1,5 +1,5 @@
 ---
-_title: "golang项目部署规范实践"
+title: "golang项目部署规范实践"
 date: 2025-07-02T16:25:00+08:00
 draft: false
 toc: true
