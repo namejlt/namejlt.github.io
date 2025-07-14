@@ -14,6 +14,9 @@ hasCJKLanguage = true  # 启用中日韩文字排版优化
   lineNos = true     # 显示行号
   lineNumbersInTable = false  # 行号独立显示
 
+[markup.goldmark.renderer]
+  unsafe = true  # 允许HTML标签
+
 [params]
   font = "Inter"  # 可选：Inter, Roboto, Open Sans 等
   codeFont = "Fira Code"  # 代码字体
