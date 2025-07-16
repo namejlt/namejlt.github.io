@@ -1,14 +1,23 @@
-# About
+---
+title: ""
+date: 2025-06-26T17:00:00+08:00
+draft: false
+toc: false
+featured: false
+usePageBundles: false
+---
 
-## About me
+# 关于
 
-I am a software engineer with a background in computer science and mathematics. I am fond of new technologies and businesses. Additionally, I am interested in summarizing and sharing knowledge.
+## 关于我
 
-## About this site
+我是一名终身学习者，拥有计算机科学和数学背景。我热爱新技术和商业。此外，我对知识的总结和分享很感兴趣。希望学习到更多知识，投入应用实践，并将其分享给他人。
 
-This website brings together my learning experiences and practical insights. I am constantly engaged in learning, practicing, and summarizing, and it also includes some other interesting shares.
+## 关于本站
 
-## Contact
+本网站汇集了我的学习经验和实践见解。我不断学习、实践和总结，其中也包含一些其他有趣的分享。
 
-If you would like to contact me, please email me at [soloheron001@gmail.com](mailto:soloheron001@gmail.com)
-This site is built with Hugo.
+## 联系方式
+
+如果您想联系我，请发送邮件至 [soloheron001@gmail.com](mailto:soloheron001@gmail.com)
+本网站使用 Hugo 构建。
