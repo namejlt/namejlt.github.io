@@ -470,7 +470,7 @@ func (s *LedgerService) CreateTransaction(ctx context.Context, entries []Entry) 
 ```
 
 ---
-
+## 异常处理机制设计
 
 系统运行时的必然会遇到一些异常，我们继续深化设计，解决在实际运行中必然会遇到的几个关键问题。这些异常处理机制是支付系统健壮性的核心体现。
 
