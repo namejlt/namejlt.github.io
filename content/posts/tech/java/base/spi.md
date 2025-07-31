@@ -3,7 +3,7 @@ title: "Java SPI实践"
 date: 2025-07-29T15:00:00+08:00
 draft: false
 toc: true
-featured: true
+featured: false
 categories: ["技术/java/基础"]
 tags: ["java"]
 ---

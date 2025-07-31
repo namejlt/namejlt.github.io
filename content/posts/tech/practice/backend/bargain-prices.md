@@ -3,7 +3,7 @@ title: "如何设计一个砍价算法"
 date: 2025-07-03T11:00:00+08:00
 draft: false
 toc: true
-featured: true
+featured: false
 categories: ["技术/实践/后端"]
 tags: ["营销工具"]
 ---
