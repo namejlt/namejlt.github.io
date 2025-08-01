@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/Golang/基础 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/golang/%E5%9F%BA%E7%A1%80/</link><description>Recent content in 技术/Golang/基础 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 01 Aug 2025 16:30:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/golang/%E5%9F%BA%E7%A1%80/index.xml" rel="self" type="application/rss+xml"/><item><title>golang内存空间结构分析</title><link>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</link><pubDate>Fri, 01 Aug 2025 16:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</guid><description>
+&lt;h2 id="内存空间结构分析">内存空间结构分析&lt;/h2>
+&lt;p>本文详细介绍Go 语言程序在运行时内存空间的具体布局、分配逻辑，以及如何进行内存优化和可观测性建设。&lt;/p>
+&lt;h3 id="程序运行时的内存空间详解">程序运行时的内存空间详解&lt;/h3>
+&lt;p>当一个 Go 程序开始运行时，操作系统会为其分配一块虚拟内存空间。这块空间在逻辑上被划分为几个关键区域，每个区域都有其特定的功能和管理方式。&lt;/p></description></item></channel></rss>
