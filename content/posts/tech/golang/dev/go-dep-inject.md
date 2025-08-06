@@ -3,7 +3,7 @@ title: "golang依赖注入实践"
 date: 2025-07-04T17:00:00+08:00
 draft: false
 toc: true
-featured: true
+featured: false
 categories: ["技术/golang/开发"]
 tags: ["golang"]
 ---
