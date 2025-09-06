@@ -1,142 +1,148 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>LX 知识库</title><link>https://namejlt.github.io/</link><description>Recent content on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 26 Aug 2025 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>评论系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/comment-system/</link><pubDate>Tue, 26 Aug 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/comment-system/</guid><description>
-&lt;h2 id="评论系统设计">评论系统设计&lt;/h2>
-&lt;p>本文要设计一个评论系统，参考“大众点评”的实现。&lt;/p>
-&lt;h3 id="1-核心挑战分析-core-challenges">&lt;strong>1. 核心挑战分析 (Core Challenges)&lt;/strong>&lt;/h3>
-&lt;p>设计一个“大众点评”级别的评论系统，我们面临的核心挑战与通用网站的评论系统有显著不同，主要体现在以下几个方面：&lt;/p></description></item><item><title>大数据技术演进</title><link>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</link><pubDate>Tue, 19 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</guid><description>
-&lt;h2 id="大数据技术演进">大数据技术演进&lt;/h2>
-&lt;p>本文通过“大白话”来讲故事，会在故事的关键节点，深入挖掘其背后的核心技术原理。&lt;/p>
-&lt;p>想象一下，我们是数字世界的拓荒者，一步步解决遇到的难题，最终建成了今天繁华的数据帝国。&lt;/p></description></item><item><title>股票证券系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/security-system/</link><pubDate>Tue, 19 Aug 2025 09:20:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/security-system/</guid><description>
-&lt;h2 id="股票证券系统设计">股票证券系统设计&lt;/h2>
-&lt;p>本文将详细设计一个股票证券软件的服务端。这份设计文档将涵盖项目目标、系统架构、功能模块、核心技术难点分析及解决方案，旨在构建一个高性能、高可用、高安全性的证券交易服务端系统。&lt;/p></description></item><item><title>SSO相关设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</link><pubDate>Mon, 18 Aug 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</guid><description>
-&lt;h2 id="sso设计">SSO设计&lt;/h2>
-&lt;h3 id="一-sso-核心设计方案">一、 SSO 核心设计方案&lt;/h3>
-&lt;p>单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p></description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
-&lt;h2 id="登录设计">登录设计&lt;/h2>
-&lt;p>本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p>
-&lt;h3 id="用户登录体系的核心目标">用户登录体系的核心目标&lt;/h3>
-&lt;p>在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p></description></item><item><title>raft详解与go实现</title><link>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</link><pubDate>Mon, 04 Aug 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</guid><description>
-&lt;h2 id="raft算法详解从理论到go语言实战">Raft算法详解：从理论到Go语言实战&lt;/h2>
-&lt;p>在分布式系统的世界里，如何保证数据的一致性是核心难题之一。Raft算法的出现，为解决这一难题提供了一个既易于理解又坚实可靠的方案。本文将深入浅出地讲解Raft算法的核心原理，并以Go语言为例，参考etcd的实现方式，编写可运行的核心代码，展示其运行结果。最后，我们将探讨Raft算法成功的原因，并简要介绍其他主流的分布式一致性算法。&lt;/p></description></item><item><title>golang内存空间结构分析</title><link>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</link><pubDate>Fri, 01 Aug 2025 16:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</guid><description>
-&lt;h2 id="内存空间结构分析">内存空间结构分析&lt;/h2>
-&lt;p>本文详细介绍Go 语言程序在运行时内存空间的具体布局、分配逻辑，以及如何进行内存优化和可观测性建设。&lt;/p>
-&lt;h3 id="程序运行时的内存空间详解">程序运行时的内存空间详解&lt;/h3>
-&lt;p>当一个 Go 程序开始运行时，操作系统会为其分配一块虚拟内存空间。这块空间在逻辑上被划分为几个关键区域，每个区域都有其特定的功能和管理方式。&lt;/p></description></item><item><title>核心大表结构修改的实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</link><pubDate>Thu, 31 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</guid><description>
-&lt;h2 id="核心大表新增字段最佳实践与终极方案探讨">核心大表新增字段：最佳实践与终极方案探讨&lt;/h2>
-&lt;p>在当今数据驱动的业务环境中，对核心业务表（如千万级甚至亿级的订单表）进行结构变更，是一项极具挑战性的任务。任何不慎的操作都可能导致长时间的服务中断、数据不一致甚至业务损失。本文将深入探讨在MySQL和PostgreSQL数据库中，为千万级订单表新增字段的业界最佳实践，分析如何通过表设计提高扩展性，并最终讨论在不考虑成本的情况下，类似TiDB的分布式数据库是否为终极解决方案。&lt;/p></description></item><item><title>Java SPI实践</title><link>https://namejlt.github.io/posts/tech/java/base/spi/</link><pubDate>Tue, 29 Jul 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/java/base/spi/</guid><description>
-&lt;h2 id="java-spi实践">Java SPI实践&lt;/h2>
-&lt;p>我们来从“是什么”、“为什么”到“怎么用”和“最佳实践”一步步来剖析Java的SPI机制。&lt;/p>
-&lt;h3 id="核心思想接口与实现分离实现动态插拔">核心思想：接口与实现分离，实现动态“插拔”&lt;/h3>
-&lt;p>想象一个场景：你的笔记本电脑有很多USB接口。这个 &lt;strong>USB接口标准&lt;/strong> 就是一个 &lt;strong>约定（Interface）&lt;/strong>。任何硬件厂商（比如罗技、闪迪）只要按照这个USB标准来生产他们的设备（鼠标、U盘），你的电脑就能识别并使用它们，而不需要你（电脑厂商）在出厂时就知道未来会有哪些USB设备。&lt;/p></description></item><item><title>从“学会提问”掌握批判性思维</title><link>https://namejlt.github.io/posts/reading/note/book/learn-ask/</link><pubDate>Mon, 28 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/book/learn-ask/</guid><description>
-&lt;h2 id="学会提问读书笔记">&amp;ldquo;学会提问&amp;quot;读书笔记&lt;/h2>
-&lt;p>今天我想和大家深入聊一本非常经典且极具价值的思维工具书——《学会提问》（&lt;em>Asking the Right Questions: A Guide to Critical Thinking&lt;/em>），由尼尔·布朗（Neil Browne）和斯图尔特·基利（Stuart Keeley）合著。&lt;/p></description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
-&lt;h2 id="摘要">摘要&lt;/h2>
-&lt;p>本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong>聚合收单&lt;/strong>、&lt;strong>批量付款&lt;/strong>、&lt;strong>内部记账&lt;/strong>和&lt;strong>自动化对账清算&lt;/strong>。设计遵循业界领先的实践，强调系统的&lt;strong>高可用&lt;/strong>、&lt;strong>高一致性&lt;/strong>、&lt;strong>安全&lt;/strong>与&lt;strong>可扩展性&lt;/strong>，并采用微服务架构实现功能解耦。&lt;/p></description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p>
-&lt;p>这套设计旨在实现&lt;strong>集中化管理&lt;/strong>、&lt;strong>高性能&lt;/strong>、&lt;strong>高可用&lt;/strong>和&lt;strong>易于接入&lt;/strong>的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p></description></item><item><title>如何让自己心智更加成熟简易版</title><link>https://namejlt.github.io/posts/life/skills/communicate/mental-maturity/</link><pubDate>Mon, 14 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/communicate/mental-maturity/</guid><description>
-&lt;h2 id="心智成熟的核心从本能反应转向自觉选择">心智成熟的核心：从本能反应转向自觉选择&lt;/h2>
-&lt;p>我们要成为一个心智成熟的成年人，核心在于&lt;strong>从“本能反应”转向“自觉选择”&lt;/strong>。这个需要主动训练和学习，通过实践，掌握其中最关键的、可应用的工具和思维模型。&lt;/p></description></item><item><title>从哲学到逻辑学的分析与简单应用</title><link>https://namejlt.github.io/posts/life/skills/logic/simple-logic/</link><pubDate>Mon, 14 Jul 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/logic/simple-logic/</guid><description>
-&lt;h2 id="逻辑学从哲学思辨到现代逻辑学">逻辑学：从哲学思辨到现代逻辑学&lt;/h2>
-&lt;p>&lt;strong>引言&lt;/strong>&lt;/p>
-&lt;p>在信息爆炸、观点交锋的时代，清晰的思考和有力的论证是我们 navigating 学习、工作与生活的必备罗盘。逻辑学，这门研究推理有效性的古老而又现代的学科，正是锻造这套罗盘的核心技艺。我们从哲学的源头探寻逻辑的脉络，系统学习逻辑学的核心思想，并最终将这些看似抽象的原则应用于实际，帮助你优化决策、完善工作、点亮生活。&lt;/p></description></item><item><title>短链系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/short-url/</link><pubDate>Thu, 10 Jul 2025 11:20:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/short-url/</guid><description>
-&lt;h2 id="短链系统设计">短链系统设计&lt;/h2>
-&lt;p>本文将详细设计一个高性能、高可用的域名短链系统。我们将遵循标准的软件设计流程，从需求分析到详细设计，并提供关键部分的Go伪代码实现思路。&lt;/p>
-&lt;hr>
-&lt;h3 id="1-需求分析-requirements-analysis">1. 需求分析 (Requirements Analysis)&lt;/h3>
-&lt;p>首先，明确功能性和非功能性需求。&lt;/p></description></item><item><title>数据库索引一览</title><link>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</link><pubDate>Thu, 10 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</guid><description>
-&lt;h2 id="数据库索引一览">数据库索引一览&lt;/h2>
-&lt;p>本文将为您全面、详细、精准地列出现代数据库所支持的几乎所有主流索引类型。&lt;/p>
-&lt;p>这份列表将涵盖从传统关系型数据库到NoSQL再到新兴的AI向量数据库的各种索引技术。每个索引类型都会包含其核心定义、对应的数据库、优缺点分析、最常见的业务使用场景，并附上在Golang中实现和使用该索引的示例代码。&lt;/p></description></item><item><title>把事情讲清楚的能力分析以及训练</title><link>https://namejlt.github.io/posts/life/skills/communicate/make-things-clear/</link><pubDate>Wed, 09 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/communicate/make-things-clear/</guid><description>
-&lt;h2 id="讲明白重点是对方听懂">讲明白重点是对方听懂&lt;/h2>
-&lt;h3 id="核心理念沟通的本质不是我说完了而是对方听懂了">&lt;strong>核心理念：沟通的本质不是“我说完了”，而是“对方听懂了”&lt;/strong>&lt;/h3>
-&lt;p>在开始之前，必须建立一个核心认知：&lt;strong>沟通的终极目标是信息的无损传递和精准理解&lt;/strong>。你的表达应该像一个精准的产品说明书，而不是一篇随性的散文。5W1H框架就是构建这份“说明书”最经典的骨架。&lt;/p></description></item><item><title>golang依赖注入实践</title><link>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</link><pubDate>Fri, 04 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</guid><description>
-&lt;h2 id="golang-依赖注入详解深入解析-googlewire">Golang 依赖注入详解，深入解析 Google/Wire&lt;/h2>
-&lt;p>在软件工程中，&lt;strong>依赖注入 (Dependency Injection, DI)&lt;/strong> 是一种重要的设计模式，其核心思想是解耦组件之间的依赖关系。一个对象的依赖不再由其内部创建，而是由外部实体“注入”。这种控制反转 (Inversion of Control, IoC) 的模式可以显著提高代码的模块化、可测试性和可维护性。&lt;/p></description></item><item><title>如何设计一个砍价算法</title><link>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</link><pubDate>Thu, 03 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>在一个电商平台上，砍价是一个常见的场景。&lt;/p>
-&lt;p>设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong>基准线+随机波动&lt;/strong>”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p></description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
-&lt;h2 id="go-web服务与异步任务部署最佳实践">Go Web服务与异步任务部署最佳实践&lt;/h2>
-&lt;p>&lt;strong>对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong>&lt;/p></description></item><item><title>服务治理相关实践-skywalking</title><link>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</link><pubDate>Tue, 01 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</guid><description>
-&lt;h2 id="skywalking-全景解析从核心逻辑到存储结构的深度剖析">SkyWalking 全景解析：从核心逻辑到存储结构的深度剖析&lt;/h2>
-&lt;p>在微服务架构日益盛行的今天，如何有效地观测、监控和诊断分布式系统成为了开发者和运维工程师面临的巨大挑战。Apache SkyWalking 作为一款顶级的开源应用性能监控（APM）工具，为分布式系统的可观测性提供了强大的解决方案。本文将带你全面了解 SkyWalking，深入探讨其核心业务逻辑、数据收集与串联机制，并揭示其底层的数据存储结构。&lt;/p></description></item><item><title>AI 笔记-大模型常见名词以及关系</title><link>https://namejlt.github.io/posts/tech/ai/note/ai-word/</link><pubDate>Thu, 26 Jun 2025 17:50:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/ai-word/</guid><description>
-&lt;h2 id="名词解释">名词解释&lt;/h2>
-&lt;p>我们可以将这些名词想象成一个金字塔结构，从顶层的应用概念到底层的核心技术，逐一解析。&lt;/p>
-&lt;h3 id="金字塔顶层概念与应用-concepts--applications">金字塔顶层：概念与应用 (Concepts &amp;amp; Applications)&lt;/h3>
-&lt;hr>
-&lt;h4 id="1-生成式ai-generative-ai">1. &lt;strong>生成式AI (Generative AI)&lt;/strong>&lt;/h4>
-&lt;ul>
-&lt;li>&lt;strong>名词解释&lt;/strong>：
-生成式AI是一类人工智能的总称，它的核心能力是&lt;strong>创造和生成全新的、原创的内容&lt;/strong>，而不是仅仅做分析、分类或识别。这些内容可以是文本、图片、音频、代码、视频甚至是三维模型。&lt;/li>
-&lt;li>&lt;strong>例子&lt;/strong>：
-&lt;ul>
-&lt;li>输入“一只穿着宇航服的猫在月球上”，生成一张对应的图片（如Midjourney, Stable Diffusion）。&lt;/li>
-&lt;li>输入“帮我写一首关于夏天的诗”，生成一首诗（如GPT系列）。&lt;/li>
-&lt;li>输入一段旋律，生成完整的乐曲。&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h4 id="2-大语言模型-large-language-model-llm">2. &lt;strong>大语言模型 (Large Language Model, LLM)&lt;/strong>&lt;/h4>
-&lt;ul>
-&lt;li>&lt;strong>名词解释&lt;/strong>：
-大语言模型是生成式AI在&lt;strong>自然语言处理（NLP）&lt;strong>领域最重要、最成功的应用。它特指那些在海量文本数据上进行训练、拥有巨量参数（通常在数十亿到数万亿之间）并能够理解和生成人类语言的模型。LLM的核心任务是&lt;/strong>预测文本序列中下一个词的概率&lt;/strong>。&lt;/li>
-&lt;li>&lt;strong>与生成式AI的关系&lt;/strong>：
-&lt;strong>LLM是生成式AI的一个子集和典型代表&lt;/strong>。可以说，生成式AI是“属”，LLM是“种”。所有LLM都是生成式AI，但生成式AI还包括图像生成模型、音频生成模型等。&lt;/li>
-&lt;/ul>
-&lt;h3 id="金字塔中层模型架构与训练方法-architecture--training">金字塔中层：模型架构与训练方法 (Architecture &amp;amp; Training)&lt;/h3>
-&lt;p>这一层解释了LLM是如何构建和训练出来的。&lt;/p></description></item><item><title>IT项目如何交接才算交接完成</title><link>https://namejlt.github.io/posts/reading/note/quesiton/project-handover/</link><pubDate>Thu, 26 Jun 2025 17:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/project-handover/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>IT公司常见的项目交接流程中，需要提供哪些文档和资料？具体需要几个步骤？交接到何种情况才算交接真正完成？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>项目交接最终要落实到文档和资料，重点在于文档资料是否能够满足，交接后的稳定运维和开发。&lt;/p></description></item><item><title>golang应用是否有必要在docker容器中运行</title><link>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</link><pubDate>Thu, 26 Jun 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>golang应用是否有必要在docker容器中运行？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>对于Go（又称Golang）开发者而言，一个常见的问题是：是否真的有必要将应用放置在Docker容器中运行？Go语言以其静态编译、无外部依赖的特性著称，生成的可执行文件本身就具备了良好的移植性。那么，再套上一层Docker，究竟是锦上添花，还是多此一举？&lt;/p></description></item><item><title>如何快速设计一个任务调度系统</title><link>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</link><pubDate>Fri, 13 Jun 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
-这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p></description></item><item><title>如何快速实现一个小型数据库</title><link>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</link><pubDate>Thu, 12 Jun 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>数据库用来存储和查询数据，现在有很多种类的数据，提供各种各样的数据存储和查询，分别适用各种不同场景，一个最简单的acid的数据库如何实现？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>ACID 是数据库事务的四个基本特性，是确保数据一致性和可靠性的关键标准：&lt;/p></description></item><item><title>任天堂NES象棋游戏AI设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</link><pubDate>Thu, 29 May 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>早期任天堂nes棋类游戏有电脑选项，它们的硬件限制相当苛刻，程序员是如何实现简单难度、中等难度、高等难度的，采用什么算法，具体如何实现？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>在任天堂NES的棋类游戏中，电脑AI的设计需在硬件限制下实现高效决策。以象棋游戏为例，其核心原理涉及规则编码、搜索算法优化和评估函数设计，以下从技术实现角度展开分析。&lt;/p></description></item><item><title>deepwiki源码阅读-04 修改验证</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</link><pubDate>Tue, 27 May 2025 18:40:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>deepwiki通过wiki生成和wiki展示的方式，把代码仓库的内容展示给用户。&lt;/p>
-&lt;p>我们可以扩展wiki生成的部分&lt;/p>
-&lt;ul>
-&lt;li>让其更加方便的支持各种大模型&lt;/li>
-&lt;li>wiki生成可以自定义结构&lt;/li>
-&lt;/ul>
-&lt;p>我们也可以更改此自动生成wiki的方式，生成其他内容，如爬取一定格式资料，生成内容分析&lt;/p></description></item><item><title>deepwiki源码阅读-03 核心逻辑分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</link><pubDate>Tue, 27 May 2025 18:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>项目主要是把代码仓库拉到本地，进行代码ebedding，然后用向量数据库存储，然后用LLM进行文档生成，最后前端通过图标和结构化wiki展示。&lt;/p></description></item><item><title>deepwiki源码阅读-02 项目整体分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</link><pubDate>Tue, 27 May 2025 18:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>在本篇文章中，我们将对 deepwiki 项目的整体架构进行系统性梳理，深入分析各层架构的设计思路与实现逻辑，剖析核心代码，并对项目进行总结，帮助读者快速把握其技术精髓。&lt;/p></description></item><item><title>deepwiki源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</link><pubDate>Tue, 27 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</guid><description>
-&lt;p>DeepWiki 是一个面向现代开发者的 AI 驱动文档生成系统，能够自动为 GitHub、GitLab、BitBucket 等代码仓库生成结构化、交互式的 Wiki 文档。其核心目标是通过多模型 AI 集成与 RAG（检索增强生成）技术，实现对私有/公开仓库的深度分析、知识问答与可视化文档输出。以下是对 DeepWiki 系统的整体介绍与关键特性梳理，便于后续源码阅读与深入理解。&lt;/p></description></item><item><title>AI 应用开发-003 AI辅助编程工具 cursor</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</link><pubDate>Sun, 25 May 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI编程工具正经历从&amp;quot;代码补全&amp;quot;到&amp;quot;全局智能协作&amp;quot;的飞跃。Cursor作为新一代AI驱动的代码编辑器，集成了多模型、全局索引、自然语言编辑、规则驱动等创新能力，成为开发者高效协作与创新的强力引擎。&lt;/p></description></item><item><title>AI 笔记-本地大模型部署</title><link>https://namejlt.github.io/posts/tech/ai/note/local-llm/</link><pubDate>Thu, 22 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/local-llm/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>本文主要简述本地部署大模型以及使用。&lt;/p>
-&lt;p>本地部署大模型不仅可以保护数据隐私，还能降低API调用成本，减少网络延迟，并且在离线环境中使用。本文将详细介绍多种本地部署大模型的方法、步骤、验证过程以及适用场景，帮助读者成功在本地环境中运行自己的大语言模型。&lt;/p></description></item><item><title>AI 应用开发-002 PROMPT 提示词</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</link><pubDate>Thu, 22 May 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>Prompt工程是AI应用开发中的关键技术，它关注如何通过优化提示词来提升AI模型的输出质量。本文将从原理、关键原则到实战技巧，全面介绍Prompt工程。&lt;/p></description></item><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p></description></item><item><title>hugo源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</link><pubDate>Fri, 16 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</guid><description>
-&lt;p>Hugo 是目前世界上最快的网站构建框架之一，也是最受欢迎的开源静态站点生成器之一。让我们通过源码阅读来深入了解这个优秀的项目。&lt;/p>
-&lt;h2 id="项目简介">项目简介&lt;/h2>
-&lt;p>Hugo 是使用 Go 语言开发的开源静态站点生成器，在 &lt;a href="https://github.com/gohugoio/hugo/blob/master/LICENSE">Apache License 2.0&lt;/a> 许可下发布。&lt;/p></description></item><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>服务端通用，需要了解和掌握的知识&lt;/p>
-&lt;p>服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p>
-&lt;ul>
-&lt;li>高可用 - 冗余设计，容错处理，自动恢复&lt;/li>
-&lt;li>高并发 - 支持大量请求&lt;/li>
-&lt;li>高性能 - 快速处理单个请求，并减少资源消耗&lt;/li>
-&lt;/ul>
-&lt;p>很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p></description></item><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI应用开发是一项复杂的任务，需要深入理解人工智能的原理和应用。以下是学习步骤，帮助您入门AI应用开发。&lt;/p>
-&lt;p>在之后的篇章中，会从概念到实战，逐步引导您掌握AI应用开发的各个方面。&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>LX 知识库</title><link>https://namejlt.github.io/</link><description>Recent content on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sat, 06 Sep 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>订单系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/order-system/</link><pubDate>Sat, 06 Sep 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/order-system/</guid><description>
+&lt;h2 id="订单系统设计"&gt;订单系统设计&lt;/h2&gt;
+&lt;p&gt;本文要设计一个订单系统，并提供一套完整、可扩展、高可用的架构方案。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="1-概述-overview"&gt;&lt;strong&gt;1. 概述 (Overview)&lt;/strong&gt;&lt;/h3&gt;
+&lt;h4 id="11-设计目标"&gt;&lt;strong&gt;1.1. 设计目标&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;订单系统是电商交易流程的核心，其稳定性、可扩展性和性能直接影响用户体验和公司营收。本次设计旨在构建一个具备以下特点的现代化订单系统：&lt;/p&gt;</description></item><item><title>评论系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/comment-system/</link><pubDate>Tue, 26 Aug 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/comment-system/</guid><description>
+&lt;h2 id="评论系统设计"&gt;评论系统设计&lt;/h2&gt;
+&lt;p&gt;本文要设计一个评论系统，参考“大众点评”的实现。&lt;/p&gt;
+&lt;h3 id="1-核心挑战分析-core-challenges"&gt;&lt;strong&gt;1. 核心挑战分析 (Core Challenges)&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;设计一个“大众点评”级别的评论系统，我们面临的核心挑战与通用网站的评论系统有显著不同，主要体现在以下几个方面：&lt;/p&gt;</description></item><item><title>大数据技术演进</title><link>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</link><pubDate>Tue, 19 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</guid><description>
+&lt;h2 id="大数据技术演进"&gt;大数据技术演进&lt;/h2&gt;
+&lt;p&gt;本文通过“大白话”来讲故事，会在故事的关键节点，深入挖掘其背后的核心技术原理。&lt;/p&gt;
+&lt;p&gt;想象一下，我们是数字世界的拓荒者，一步步解决遇到的难题，最终建成了今天繁华的数据帝国。&lt;/p&gt;</description></item><item><title>股票证券系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/security-system/</link><pubDate>Tue, 19 Aug 2025 09:20:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/security-system/</guid><description>
+&lt;h2 id="股票证券系统设计"&gt;股票证券系统设计&lt;/h2&gt;
+&lt;p&gt;本文将详细设计一个股票证券软件的服务端。这份设计文档将涵盖项目目标、系统架构、功能模块、核心技术难点分析及解决方案，旨在构建一个高性能、高可用、高安全性的证券交易服务端系统。&lt;/p&gt;</description></item><item><title>SSO相关设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</link><pubDate>Mon, 18 Aug 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</guid><description>
+&lt;h2 id="sso设计"&gt;SSO设计&lt;/h2&gt;
+&lt;h3 id="一-sso-核心设计方案"&gt;一、 SSO 核心设计方案&lt;/h3&gt;
+&lt;p&gt;单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p&gt;</description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
+&lt;h2 id="登录设计"&gt;登录设计&lt;/h2&gt;
+&lt;p&gt;本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p&gt;
+&lt;h3 id="用户登录体系的核心目标"&gt;用户登录体系的核心目标&lt;/h3&gt;
+&lt;p&gt;在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p&gt;</description></item><item><title>raft详解与go实现</title><link>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</link><pubDate>Mon, 04 Aug 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</guid><description>
+&lt;h2 id="raft算法详解从理论到go语言实战"&gt;Raft算法详解：从理论到Go语言实战&lt;/h2&gt;
+&lt;p&gt;在分布式系统的世界里，如何保证数据的一致性是核心难题之一。Raft算法的出现，为解决这一难题提供了一个既易于理解又坚实可靠的方案。本文将深入浅出地讲解Raft算法的核心原理，并以Go语言为例，参考etcd的实现方式，编写可运行的核心代码，展示其运行结果。最后，我们将探讨Raft算法成功的原因，并简要介绍其他主流的分布式一致性算法。&lt;/p&gt;</description></item><item><title>golang内存空间结构分析</title><link>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</link><pubDate>Fri, 01 Aug 2025 16:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</guid><description>
+&lt;h2 id="内存空间结构分析"&gt;内存空间结构分析&lt;/h2&gt;
+&lt;p&gt;本文详细介绍Go 语言程序在运行时内存空间的具体布局、分配逻辑，以及如何进行内存优化和可观测性建设。&lt;/p&gt;
+&lt;h3 id="程序运行时的内存空间详解"&gt;程序运行时的内存空间详解&lt;/h3&gt;
+&lt;p&gt;当一个 Go 程序开始运行时，操作系统会为其分配一块虚拟内存空间。这块空间在逻辑上被划分为几个关键区域，每个区域都有其特定的功能和管理方式。&lt;/p&gt;</description></item><item><title>核心大表结构修改的实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</link><pubDate>Thu, 31 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</guid><description>
+&lt;h2 id="核心大表新增字段最佳实践与终极方案探讨"&gt;核心大表新增字段：最佳实践与终极方案探讨&lt;/h2&gt;
+&lt;p&gt;在当今数据驱动的业务环境中，对核心业务表（如千万级甚至亿级的订单表）进行结构变更，是一项极具挑战性的任务。任何不慎的操作都可能导致长时间的服务中断、数据不一致甚至业务损失。本文将深入探讨在MySQL和PostgreSQL数据库中，为千万级订单表新增字段的业界最佳实践，分析如何通过表设计提高扩展性，并最终讨论在不考虑成本的情况下，类似TiDB的分布式数据库是否为终极解决方案。&lt;/p&gt;</description></item><item><title>Java SPI实践</title><link>https://namejlt.github.io/posts/tech/java/base/spi/</link><pubDate>Tue, 29 Jul 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/java/base/spi/</guid><description>
+&lt;h2 id="java-spi实践"&gt;Java SPI实践&lt;/h2&gt;
+&lt;p&gt;我们来从“是什么”、“为什么”到“怎么用”和“最佳实践”一步步来剖析Java的SPI机制。&lt;/p&gt;
+&lt;h3 id="核心思想接口与实现分离实现动态插拔"&gt;核心思想：接口与实现分离，实现动态“插拔”&lt;/h3&gt;
+&lt;p&gt;想象一个场景：你的笔记本电脑有很多USB接口。这个 &lt;strong&gt;USB接口标准&lt;/strong&gt; 就是一个 &lt;strong&gt;约定（Interface）&lt;/strong&gt;。任何硬件厂商（比如罗技、闪迪）只要按照这个USB标准来生产他们的设备（鼠标、U盘），你的电脑就能识别并使用它们，而不需要你（电脑厂商）在出厂时就知道未来会有哪些USB设备。&lt;/p&gt;</description></item><item><title>从“学会提问”掌握批判性思维</title><link>https://namejlt.github.io/posts/reading/note/book/learn-ask/</link><pubDate>Mon, 28 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/book/learn-ask/</guid><description>
+&lt;h2 id="学会提问读书笔记"&gt;&amp;ldquo;学会提问&amp;quot;读书笔记&lt;/h2&gt;
+&lt;p&gt;今天我想和大家深入聊一本非常经典且极具价值的思维工具书——《学会提问》（&lt;em&gt;Asking the Right Questions: A Guide to Critical Thinking&lt;/em&gt;），由尼尔·布朗（Neil Browne）和斯图尔特·基利（Stuart Keeley）合著。&lt;/p&gt;</description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
+&lt;h2 id="摘要"&gt;摘要&lt;/h2&gt;
+&lt;p&gt;本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong&gt;聚合收单&lt;/strong&gt;、&lt;strong&gt;批量付款&lt;/strong&gt;、&lt;strong&gt;内部记账&lt;/strong&gt;和&lt;strong&gt;自动化对账清算&lt;/strong&gt;。设计遵循业界领先的实践，强调系统的&lt;strong&gt;高可用&lt;/strong&gt;、&lt;strong&gt;高一致性&lt;/strong&gt;、&lt;strong&gt;安全&lt;/strong&gt;与&lt;strong&gt;可扩展性&lt;/strong&gt;，并采用微服务架构实现功能解耦。&lt;/p&gt;</description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p&gt;
+&lt;p&gt;这套设计旨在实现&lt;strong&gt;集中化管理&lt;/strong&gt;、&lt;strong&gt;高性能&lt;/strong&gt;、&lt;strong&gt;高可用&lt;/strong&gt;和&lt;strong&gt;易于接入&lt;/strong&gt;的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p&gt;</description></item><item><title>如何让自己心智更加成熟简易版</title><link>https://namejlt.github.io/posts/life/skills/communicate/mental-maturity/</link><pubDate>Mon, 14 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/communicate/mental-maturity/</guid><description>
+&lt;h2 id="心智成熟的核心从本能反应转向自觉选择"&gt;心智成熟的核心：从本能反应转向自觉选择&lt;/h2&gt;
+&lt;p&gt;我们要成为一个心智成熟的成年人，核心在于&lt;strong&gt;从“本能反应”转向“自觉选择”&lt;/strong&gt;。这个需要主动训练和学习，通过实践，掌握其中最关键的、可应用的工具和思维模型。&lt;/p&gt;</description></item><item><title>从哲学到逻辑学的分析与简单应用</title><link>https://namejlt.github.io/posts/life/skills/logic/simple-logic/</link><pubDate>Mon, 14 Jul 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/logic/simple-logic/</guid><description>
+&lt;h2 id="逻辑学从哲学思辨到现代逻辑学"&gt;逻辑学：从哲学思辨到现代逻辑学&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;引言&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;在信息爆炸、观点交锋的时代，清晰的思考和有力的论证是我们 navigating 学习、工作与生活的必备罗盘。逻辑学，这门研究推理有效性的古老而又现代的学科，正是锻造这套罗盘的核心技艺。我们从哲学的源头探寻逻辑的脉络，系统学习逻辑学的核心思想，并最终将这些看似抽象的原则应用于实际，帮助你优化决策、完善工作、点亮生活。&lt;/p&gt;</description></item><item><title>短链系统设计</title><link>https://namejlt.github.io/posts/tech/practice/design/short-url/</link><pubDate>Thu, 10 Jul 2025 11:20:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/design/short-url/</guid><description>
+&lt;h2 id="短链系统设计"&gt;短链系统设计&lt;/h2&gt;
+&lt;p&gt;本文将详细设计一个高性能、高可用的域名短链系统。我们将遵循标准的软件设计流程，从需求分析到详细设计，并提供关键部分的Go伪代码实现思路。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="1-需求分析-requirements-analysis"&gt;1. 需求分析 (Requirements Analysis)&lt;/h3&gt;
+&lt;p&gt;首先，明确功能性和非功能性需求。&lt;/p&gt;</description></item><item><title>数据库索引一览</title><link>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</link><pubDate>Thu, 10 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</guid><description>
+&lt;h2 id="数据库索引一览"&gt;数据库索引一览&lt;/h2&gt;
+&lt;p&gt;本文将为您全面、详细、精准地列出现代数据库所支持的几乎所有主流索引类型。&lt;/p&gt;
+&lt;p&gt;这份列表将涵盖从传统关系型数据库到NoSQL再到新兴的AI向量数据库的各种索引技术。每个索引类型都会包含其核心定义、对应的数据库、优缺点分析、最常见的业务使用场景，并附上在Golang中实现和使用该索引的示例代码。&lt;/p&gt;</description></item><item><title>把事情讲清楚的能力分析以及训练</title><link>https://namejlt.github.io/posts/life/skills/communicate/make-things-clear/</link><pubDate>Wed, 09 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/life/skills/communicate/make-things-clear/</guid><description>
+&lt;h2 id="讲明白重点是对方听懂"&gt;讲明白重点是对方听懂&lt;/h2&gt;
+&lt;h3 id="核心理念沟通的本质不是我说完了而是对方听懂了"&gt;&lt;strong&gt;核心理念：沟通的本质不是“我说完了”，而是“对方听懂了”&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;在开始之前，必须建立一个核心认知：&lt;strong&gt;沟通的终极目标是信息的无损传递和精准理解&lt;/strong&gt;。你的表达应该像一个精准的产品说明书，而不是一篇随性的散文。5W1H框架就是构建这份“说明书”最经典的骨架。&lt;/p&gt;</description></item><item><title>golang依赖注入实践</title><link>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</link><pubDate>Fri, 04 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</guid><description>
+&lt;h2 id="golang-依赖注入详解深入解析-googlewire"&gt;Golang 依赖注入详解，深入解析 Google/Wire&lt;/h2&gt;
+&lt;p&gt;在软件工程中，&lt;strong&gt;依赖注入 (Dependency Injection, DI)&lt;/strong&gt; 是一种重要的设计模式，其核心思想是解耦组件之间的依赖关系。一个对象的依赖不再由其内部创建，而是由外部实体“注入”。这种控制反转 (Inversion of Control, IoC) 的模式可以显著提高代码的模块化、可测试性和可维护性。&lt;/p&gt;</description></item><item><title>如何设计一个砍价算法</title><link>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</link><pubDate>Thu, 03 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</guid><description>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;在一个电商平台上，砍价是一个常见的场景。&lt;/p&gt;
+&lt;p&gt;设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong&gt;基准线+随机波动&lt;/strong&gt;”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p&gt;</description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
+&lt;h2 id="go-web服务与异步任务部署最佳实践"&gt;Go Web服务与异步任务部署最佳实践&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>服务治理相关实践-skywalking</title><link>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</link><pubDate>Tue, 01 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</guid><description>
+&lt;h2 id="skywalking-全景解析从核心逻辑到存储结构的深度剖析"&gt;SkyWalking 全景解析：从核心逻辑到存储结构的深度剖析&lt;/h2&gt;
+&lt;p&gt;在微服务架构日益盛行的今天，如何有效地观测、监控和诊断分布式系统成为了开发者和运维工程师面临的巨大挑战。Apache SkyWalking 作为一款顶级的开源应用性能监控（APM）工具，为分布式系统的可观测性提供了强大的解决方案。本文将带你全面了解 SkyWalking，深入探讨其核心业务逻辑、数据收集与串联机制，并揭示其底层的数据存储结构。&lt;/p&gt;</description></item><item><title>AI 笔记-大模型常见名词以及关系</title><link>https://namejlt.github.io/posts/tech/ai/note/ai-word/</link><pubDate>Thu, 26 Jun 2025 17:50:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/ai-word/</guid><description>
+&lt;h2 id="名词解释"&gt;名词解释&lt;/h2&gt;
+&lt;p&gt;我们可以将这些名词想象成一个金字塔结构，从顶层的应用概念到底层的核心技术，逐一解析。&lt;/p&gt;
+&lt;h3 id="金字塔顶层概念与应用-concepts--applications"&gt;金字塔顶层：概念与应用 (Concepts &amp;amp; Applications)&lt;/h3&gt;
+&lt;hr&gt;
+&lt;h4 id="1-生成式ai-generative-ai"&gt;1. &lt;strong&gt;生成式AI (Generative AI)&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;名词解释&lt;/strong&gt;：
+生成式AI是一类人工智能的总称，它的核心能力是&lt;strong&gt;创造和生成全新的、原创的内容&lt;/strong&gt;，而不是仅仅做分析、分类或识别。这些内容可以是文本、图片、音频、代码、视频甚至是三维模型。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;例子&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;输入“一只穿着宇航服的猫在月球上”，生成一张对应的图片（如Midjourney, Stable Diffusion）。&lt;/li&gt;
+&lt;li&gt;输入“帮我写一首关于夏天的诗”，生成一首诗（如GPT系列）。&lt;/li&gt;
+&lt;li&gt;输入一段旋律，生成完整的乐曲。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-大语言模型-large-language-model-llm"&gt;2. &lt;strong&gt;大语言模型 (Large Language Model, LLM)&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;名词解释&lt;/strong&gt;：
+大语言模型是生成式AI在&lt;strong&gt;自然语言处理（NLP）&lt;strong&gt;领域最重要、最成功的应用。它特指那些在海量文本数据上进行训练、拥有巨量参数（通常在数十亿到数万亿之间）并能够理解和生成人类语言的模型。LLM的核心任务是&lt;/strong&gt;预测文本序列中下一个词的概率&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;与生成式AI的关系&lt;/strong&gt;：
+&lt;strong&gt;LLM是生成式AI的一个子集和典型代表&lt;/strong&gt;。可以说，生成式AI是“属”，LLM是“种”。所有LLM都是生成式AI，但生成式AI还包括图像生成模型、音频生成模型等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="金字塔中层模型架构与训练方法-architecture--training"&gt;金字塔中层：模型架构与训练方法 (Architecture &amp;amp; Training)&lt;/h3&gt;
+&lt;p&gt;这一层解释了LLM是如何构建和训练出来的。&lt;/p&gt;</description></item><item><title>IT项目如何交接才算交接完成</title><link>https://namejlt.github.io/posts/reading/note/quesiton/project-handover/</link><pubDate>Thu, 26 Jun 2025 17:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/project-handover/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;IT公司常见的项目交接流程中，需要提供哪些文档和资料？具体需要几个步骤？交接到何种情况才算交接真正完成？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;项目交接最终要落实到文档和资料，重点在于文档资料是否能够满足，交接后的稳定运维和开发。&lt;/p&gt;</description></item><item><title>golang应用是否有必要在docker容器中运行</title><link>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</link><pubDate>Thu, 26 Jun 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;golang应用是否有必要在docker容器中运行？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;对于Go（又称Golang）开发者而言，一个常见的问题是：是否真的有必要将应用放置在Docker容器中运行？Go语言以其静态编译、无外部依赖的特性著称，生成的可执行文件本身就具备了良好的移植性。那么，再套上一层Docker，究竟是锦上添花，还是多此一举？&lt;/p&gt;</description></item><item><title>如何快速设计一个任务调度系统</title><link>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</link><pubDate>Fri, 13 Jun 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
+这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p&gt;</description></item><item><title>如何快速实现一个小型数据库</title><link>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</link><pubDate>Thu, 12 Jun 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;数据库用来存储和查询数据，现在有很多种类的数据，提供各种各样的数据存储和查询，分别适用各种不同场景，一个最简单的acid的数据库如何实现？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;ACID 是数据库事务的四个基本特性，是确保数据一致性和可靠性的关键标准：&lt;/p&gt;</description></item><item><title>任天堂NES象棋游戏AI设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</link><pubDate>Thu, 29 May 2025 15:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/nes-chinese-chess-game/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;早期任天堂nes棋类游戏有电脑选项，它们的硬件限制相当苛刻，程序员是如何实现简单难度、中等难度、高等难度的，采用什么算法，具体如何实现？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;在任天堂NES的棋类游戏中，电脑AI的设计需在硬件限制下实现高效决策。以象棋游戏为例，其核心原理涉及规则编码、搜索算法优化和评估函数设计，以下从技术实现角度展开分析。&lt;/p&gt;</description></item><item><title>deepwiki源码阅读-04 修改验证</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</link><pubDate>Tue, 27 May 2025 18:40:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/04diy/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;deepwiki通过wiki生成和wiki展示的方式，把代码仓库的内容展示给用户。&lt;/p&gt;
+&lt;p&gt;我们可以扩展wiki生成的部分&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;让其更加方便的支持各种大模型&lt;/li&gt;
+&lt;li&gt;wiki生成可以自定义结构&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我们也可以更改此自动生成wiki的方式，生成其他内容，如爬取一定格式资料，生成内容分析&lt;/p&gt;</description></item><item><title>deepwiki源码阅读-03 核心逻辑分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</link><pubDate>Tue, 27 May 2025 18:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/03core/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;项目主要是把代码仓库拉到本地，进行代码ebedding，然后用向量数据库存储，然后用LLM进行文档生成，最后前端通过图标和结构化wiki展示。&lt;/p&gt;</description></item><item><title>deepwiki源码阅读-02 项目整体分析</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</link><pubDate>Tue, 27 May 2025 18:10:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/02project/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;在本篇文章中，我们将对 deepwiki 项目的整体架构进行系统性梳理，深入分析各层架构的设计思路与实现逻辑，剖析核心代码，并对项目进行总结，帮助读者快速把握其技术精髓。&lt;/p&gt;</description></item><item><title>deepwiki源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</link><pubDate>Tue, 27 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/deepwiki/01start/</guid><description>
+&lt;p&gt;DeepWiki 是一个面向现代开发者的 AI 驱动文档生成系统，能够自动为 GitHub、GitLab、BitBucket 等代码仓库生成结构化、交互式的 Wiki 文档。其核心目标是通过多模型 AI 集成与 RAG（检索增强生成）技术，实现对私有/公开仓库的深度分析、知识问答与可视化文档输出。以下是对 DeepWiki 系统的整体介绍与关键特性梳理，便于后续源码阅读与深入理解。&lt;/p&gt;</description></item><item><title>AI 应用开发-003 AI辅助编程工具 cursor</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</link><pubDate>Sun, 25 May 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI编程工具正经历从&amp;quot;代码补全&amp;quot;到&amp;quot;全局智能协作&amp;quot;的飞跃。Cursor作为新一代AI驱动的代码编辑器，集成了多模型、全局索引、自然语言编辑、规则驱动等创新能力，成为开发者高效协作与创新的强力引擎。&lt;/p&gt;</description></item><item><title>AI 笔记-本地大模型部署</title><link>https://namejlt.github.io/posts/tech/ai/note/local-llm/</link><pubDate>Thu, 22 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/local-llm/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;本文主要简述本地部署大模型以及使用。&lt;/p&gt;
+&lt;p&gt;本地部署大模型不仅可以保护数据隐私，还能降低API调用成本，减少网络延迟，并且在离线环境中使用。本文将详细介绍多种本地部署大模型的方法、步骤、验证过程以及适用场景，帮助读者成功在本地环境中运行自己的大语言模型。&lt;/p&gt;</description></item><item><title>AI 应用开发-002 PROMPT 提示词</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</link><pubDate>Thu, 22 May 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;Prompt工程是AI应用开发中的关键技术，它关注如何通过优化提示词来提升AI模型的输出质量。本文将从原理、关键原则到实战技巧，全面介绍Prompt工程。&lt;/p&gt;</description></item><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p&gt;</description></item><item><title>hugo源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</link><pubDate>Fri, 16 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</guid><description>
+&lt;p&gt;Hugo 是目前世界上最快的网站构建框架之一，也是最受欢迎的开源静态站点生成器之一。让我们通过源码阅读来深入了解这个优秀的项目。&lt;/p&gt;
+&lt;h2 id="项目简介"&gt;项目简介&lt;/h2&gt;
+&lt;p&gt;Hugo 是使用 Go 语言开发的开源静态站点生成器，在 &lt;a href="https://github.com/gohugoio/hugo/blob/master/LICENSE"&gt;Apache License 2.0&lt;/a&gt; 许可下发布。&lt;/p&gt;</description></item><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;服务端通用，需要了解和掌握的知识&lt;/p&gt;
+&lt;p&gt;服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;高可用 - 冗余设计，容错处理，自动恢复&lt;/li&gt;
+&lt;li&gt;高并发 - 支持大量请求&lt;/li&gt;
+&lt;li&gt;高性能 - 快速处理单个请求，并减少资源消耗&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p&gt;</description></item><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI应用开发是一项复杂的任务，需要深入理解人工智能的原理和应用。以下是学习步骤，帮助您入门AI应用开发。&lt;/p&gt;
+&lt;p&gt;在之后的篇章中，会从概念到实战，逐步引导您掌握AI应用开发的各个方面。&lt;/p&gt;</description></item></channel></rss>

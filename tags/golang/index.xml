@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Golang on LX 知识库</title><link>https://namejlt.github.io/tags/golang/</link><description>Recent content in Golang on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 04 Aug 2025 16:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml"/><item><title>raft详解与go实现</title><link>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</link><pubDate>Mon, 04 Aug 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/raft-simple/</guid><description>
-&lt;h2 id="raft算法详解从理论到go语言实战">Raft算法详解：从理论到Go语言实战&lt;/h2>
-&lt;p>在分布式系统的世界里，如何保证数据的一致性是核心难题之一。Raft算法的出现，为解决这一难题提供了一个既易于理解又坚实可靠的方案。本文将深入浅出地讲解Raft算法的核心原理，并以Go语言为例，参考etcd的实现方式，编写可运行的核心代码，展示其运行结果。最后，我们将探讨Raft算法成功的原因，并简要介绍其他主流的分布式一致性算法。&lt;/p></description></item><item><title>golang内存空间结构分析</title><link>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</link><pubDate>Fri, 01 Aug 2025 16:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</guid><description>
-&lt;h2 id="内存空间结构分析">内存空间结构分析&lt;/h2>
-&lt;p>本文详细介绍Go 语言程序在运行时内存空间的具体布局、分配逻辑，以及如何进行内存优化和可观测性建设。&lt;/p>
-&lt;h3 id="程序运行时的内存空间详解">程序运行时的内存空间详解&lt;/h3>
-&lt;p>当一个 Go 程序开始运行时，操作系统会为其分配一块虚拟内存空间。这块空间在逻辑上被划分为几个关键区域，每个区域都有其特定的功能和管理方式。&lt;/p></description></item><item><title>golang依赖注入实践</title><link>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</link><pubDate>Fri, 04 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</guid><description>
-&lt;h2 id="golang-依赖注入详解深入解析-googlewire">Golang 依赖注入详解，深入解析 Google/Wire&lt;/h2>
-&lt;p>在软件工程中，&lt;strong>依赖注入 (Dependency Injection, DI)&lt;/strong> 是一种重要的设计模式，其核心思想是解耦组件之间的依赖关系。一个对象的依赖不再由其内部创建，而是由外部实体“注入”。这种控制反转 (Inversion of Control, IoC) 的模式可以显著提高代码的模块化、可测试性和可维护性。&lt;/p></description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
-&lt;h2 id="go-web服务与异步任务部署最佳实践">Go Web服务与异步任务部署最佳实践&lt;/h2>
-&lt;p>&lt;strong>对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong>&lt;/p></description></item><item><title>golang应用是否有必要在docker容器中运行</title><link>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</link><pubDate>Thu, 26 Jun 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>golang应用是否有必要在docker容器中运行？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>对于Go（又称Golang）开发者而言，一个常见的问题是：是否真的有必要将应用放置在Docker容器中运行？Go语言以其静态编译、无外部依赖的特性著称，生成的可执行文件本身就具备了良好的移植性。那么，再套上一层Docker，究竟是锦上添花，还是多此一举？&lt;/p></description></item><item><title>如何快速设计一个任务调度系统</title><link>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</link><pubDate>Fri, 13 Jun 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
-这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p></description></item><item><title>如何快速实现一个小型数据库</title><link>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</link><pubDate>Thu, 12 Jun 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>数据库用来存储和查询数据，现在有很多种类的数据，提供各种各样的数据存储和查询，分别适用各种不同场景，一个最简单的acid的数据库如何实现？&lt;/p>
-&lt;h2 id="回答">回答&lt;/h2>
-&lt;p>ACID 是数据库事务的四个基本特性，是确保数据一致性和可靠性的关键标准：&lt;/p></description></item></channel></rss>
+&lt;h2 id="raft算法详解从理论到go语言实战"&gt;Raft算法详解：从理论到Go语言实战&lt;/h2&gt;
+&lt;p&gt;在分布式系统的世界里，如何保证数据的一致性是核心难题之一。Raft算法的出现，为解决这一难题提供了一个既易于理解又坚实可靠的方案。本文将深入浅出地讲解Raft算法的核心原理，并以Go语言为例，参考etcd的实现方式，编写可运行的核心代码，展示其运行结果。最后，我们将探讨Raft算法成功的原因，并简要介绍其他主流的分布式一致性算法。&lt;/p&gt;</description></item><item><title>golang内存空间结构分析</title><link>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</link><pubDate>Fri, 01 Aug 2025 16:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/base/memory-struct/</guid><description>
+&lt;h2 id="内存空间结构分析"&gt;内存空间结构分析&lt;/h2&gt;
+&lt;p&gt;本文详细介绍Go 语言程序在运行时内存空间的具体布局、分配逻辑，以及如何进行内存优化和可观测性建设。&lt;/p&gt;
+&lt;h3 id="程序运行时的内存空间详解"&gt;程序运行时的内存空间详解&lt;/h3&gt;
+&lt;p&gt;当一个 Go 程序开始运行时，操作系统会为其分配一块虚拟内存空间。这块空间在逻辑上被划分为几个关键区域，每个区域都有其特定的功能和管理方式。&lt;/p&gt;</description></item><item><title>golang依赖注入实践</title><link>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</link><pubDate>Fri, 04 Jul 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/</guid><description>
+&lt;h2 id="golang-依赖注入详解深入解析-googlewire"&gt;Golang 依赖注入详解，深入解析 Google/Wire&lt;/h2&gt;
+&lt;p&gt;在软件工程中，&lt;strong&gt;依赖注入 (Dependency Injection, DI)&lt;/strong&gt; 是一种重要的设计模式，其核心思想是解耦组件之间的依赖关系。一个对象的依赖不再由其内部创建，而是由外部实体“注入”。这种控制反转 (Inversion of Control, IoC) 的模式可以显著提高代码的模块化、可测试性和可维护性。&lt;/p&gt;</description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
+&lt;h2 id="go-web服务与异步任务部署最佳实践"&gt;Go Web服务与异步任务部署最佳实践&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>golang应用是否有必要在docker容器中运行</title><link>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</link><pubDate>Thu, 26 Jun 2025 17:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/go-docker/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;golang应用是否有必要在docker容器中运行？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;对于Go（又称Golang）开发者而言，一个常见的问题是：是否真的有必要将应用放置在Docker容器中运行？Go语言以其静态编译、无外部依赖的特性著称，生成的可执行文件本身就具备了良好的移植性。那么，再套上一层Docker，究竟是锦上添花，还是多此一举？&lt;/p&gt;</description></item><item><title>如何快速设计一个任务调度系统</title><link>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</link><pubDate>Fri, 13 Jun 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
+这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p&gt;</description></item><item><title>如何快速实现一个小型数据库</title><link>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</link><pubDate>Thu, 12 Jun 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/small-database/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;数据库用来存储和查询数据，现在有很多种类的数据，提供各种各样的数据存储和查询，分别适用各种不同场景，一个最简单的acid的数据库如何实现？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;ACID 是数据库事务的四个基本特性，是确保数据一致性和可靠性的关键标准：&lt;/p&gt;</description></item></channel></rss>

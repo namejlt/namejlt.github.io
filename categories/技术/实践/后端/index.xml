@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/实践/后端 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/</link><description>Recent content in 技术/实践/后端 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 19 Aug 2025 11:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>大数据技术演进</title><link>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</link><pubDate>Tue, 19 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bigdata-story/</guid><description>
-&lt;h2 id="大数据技术演进">大数据技术演进&lt;/h2>
-&lt;p>本文通过“大白话”来讲故事，会在故事的关键节点，深入挖掘其背后的核心技术原理。&lt;/p>
-&lt;p>想象一下，我们是数字世界的拓荒者，一步步解决遇到的难题，最终建成了今天繁华的数据帝国。&lt;/p></description></item><item><title>SSO相关设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</link><pubDate>Mon, 18 Aug 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</guid><description>
-&lt;h2 id="sso设计">SSO设计&lt;/h2>
-&lt;h3 id="一-sso-核心设计方案">一、 SSO 核心设计方案&lt;/h3>
-&lt;p>单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p></description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
-&lt;h2 id="登录设计">登录设计&lt;/h2>
-&lt;p>本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p>
-&lt;h3 id="用户登录体系的核心目标">用户登录体系的核心目标&lt;/h3>
-&lt;p>在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p></description></item><item><title>核心大表结构修改的实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</link><pubDate>Thu, 31 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</guid><description>
-&lt;h2 id="核心大表新增字段最佳实践与终极方案探讨">核心大表新增字段：最佳实践与终极方案探讨&lt;/h2>
-&lt;p>在当今数据驱动的业务环境中，对核心业务表（如千万级甚至亿级的订单表）进行结构变更，是一项极具挑战性的任务。任何不慎的操作都可能导致长时间的服务中断、数据不一致甚至业务损失。本文将深入探讨在MySQL和PostgreSQL数据库中，为千万级订单表新增字段的业界最佳实践，分析如何通过表设计提高扩展性，并最终讨论在不考虑成本的情况下，类似TiDB的分布式数据库是否为终极解决方案。&lt;/p></description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
-&lt;h2 id="摘要">摘要&lt;/h2>
-&lt;p>本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong>聚合收单&lt;/strong>、&lt;strong>批量付款&lt;/strong>、&lt;strong>内部记账&lt;/strong>和&lt;strong>自动化对账清算&lt;/strong>。设计遵循业界领先的实践，强调系统的&lt;strong>高可用&lt;/strong>、&lt;strong>高一致性&lt;/strong>、&lt;strong>安全&lt;/strong>与&lt;strong>可扩展性&lt;/strong>，并采用微服务架构实现功能解耦。&lt;/p></description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p>
-&lt;p>这套设计旨在实现&lt;strong>集中化管理&lt;/strong>、&lt;strong>高性能&lt;/strong>、&lt;strong>高可用&lt;/strong>和&lt;strong>易于接入&lt;/strong>的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p></description></item><item><title>数据库索引一览</title><link>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</link><pubDate>Thu, 10 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</guid><description>
-&lt;h2 id="数据库索引一览">数据库索引一览&lt;/h2>
-&lt;p>本文将为您全面、详细、精准地列出现代数据库所支持的几乎所有主流索引类型。&lt;/p>
-&lt;p>这份列表将涵盖从传统关系型数据库到NoSQL再到新兴的AI向量数据库的各种索引技术。每个索引类型都会包含其核心定义、对应的数据库、优缺点分析、最常见的业务使用场景，并附上在Golang中实现和使用该索引的示例代码。&lt;/p></description></item><item><title>如何设计一个砍价算法</title><link>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</link><pubDate>Thu, 03 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>在一个电商平台上，砍价是一个常见的场景。&lt;/p>
-&lt;p>设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong>基准线+随机波动&lt;/strong>”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p></description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
-&lt;h2 id="go-web服务与异步任务部署最佳实践">Go Web服务与异步任务部署最佳实践&lt;/h2>
-&lt;p>&lt;strong>对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong>&lt;/p></description></item><item><title>服务治理相关实践-skywalking</title><link>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</link><pubDate>Tue, 01 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</guid><description>
-&lt;h2 id="skywalking-全景解析从核心逻辑到存储结构的深度剖析">SkyWalking 全景解析：从核心逻辑到存储结构的深度剖析&lt;/h2>
-&lt;p>在微服务架构日益盛行的今天，如何有效地观测、监控和诊断分布式系统成为了开发者和运维工程师面临的巨大挑战。Apache SkyWalking 作为一款顶级的开源应用性能监控（APM）工具，为分布式系统的可观测性提供了强大的解决方案。本文将带你全面了解 SkyWalking，深入探讨其核心业务逻辑、数据收集与串联机制，并揭示其底层的数据存储结构。&lt;/p></description></item><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>服务端通用，需要了解和掌握的知识&lt;/p>
-&lt;p>服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p>
-&lt;ul>
-&lt;li>高可用 - 冗余设计，容错处理，自动恢复&lt;/li>
-&lt;li>高并发 - 支持大量请求&lt;/li>
-&lt;li>高性能 - 快速处理单个请求，并减少资源消耗&lt;/li>
-&lt;/ul>
-&lt;p>很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p></description></item></channel></rss>
+&lt;h2 id="大数据技术演进"&gt;大数据技术演进&lt;/h2&gt;
+&lt;p&gt;本文通过“大白话”来讲故事，会在故事的关键节点，深入挖掘其背后的核心技术原理。&lt;/p&gt;
+&lt;p&gt;想象一下，我们是数字世界的拓荒者，一步步解决遇到的难题，最终建成了今天繁华的数据帝国。&lt;/p&gt;</description></item><item><title>SSO相关设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</link><pubDate>Mon, 18 Aug 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</guid><description>
+&lt;h2 id="sso设计"&gt;SSO设计&lt;/h2&gt;
+&lt;h3 id="一-sso-核心设计方案"&gt;一、 SSO 核心设计方案&lt;/h3&gt;
+&lt;p&gt;单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p&gt;</description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
+&lt;h2 id="登录设计"&gt;登录设计&lt;/h2&gt;
+&lt;p&gt;本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p&gt;
+&lt;h3 id="用户登录体系的核心目标"&gt;用户登录体系的核心目标&lt;/h3&gt;
+&lt;p&gt;在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p&gt;</description></item><item><title>核心大表结构修改的实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</link><pubDate>Thu, 31 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/big-table-alter-add-field/</guid><description>
+&lt;h2 id="核心大表新增字段最佳实践与终极方案探讨"&gt;核心大表新增字段：最佳实践与终极方案探讨&lt;/h2&gt;
+&lt;p&gt;在当今数据驱动的业务环境中，对核心业务表（如千万级甚至亿级的订单表）进行结构变更，是一项极具挑战性的任务。任何不慎的操作都可能导致长时间的服务中断、数据不一致甚至业务损失。本文将深入探讨在MySQL和PostgreSQL数据库中，为千万级订单表新增字段的业界最佳实践，分析如何通过表设计提高扩展性，并最终讨论在不考虑成本的情况下，类似TiDB的分布式数据库是否为终极解决方案。&lt;/p&gt;</description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
+&lt;h2 id="摘要"&gt;摘要&lt;/h2&gt;
+&lt;p&gt;本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong&gt;聚合收单&lt;/strong&gt;、&lt;strong&gt;批量付款&lt;/strong&gt;、&lt;strong&gt;内部记账&lt;/strong&gt;和&lt;strong&gt;自动化对账清算&lt;/strong&gt;。设计遵循业界领先的实践，强调系统的&lt;strong&gt;高可用&lt;/strong&gt;、&lt;strong&gt;高一致性&lt;/strong&gt;、&lt;strong&gt;安全&lt;/strong&gt;与&lt;strong&gt;可扩展性&lt;/strong&gt;，并采用微服务架构实现功能解耦。&lt;/p&gt;</description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p&gt;
+&lt;p&gt;这套设计旨在实现&lt;strong&gt;集中化管理&lt;/strong&gt;、&lt;strong&gt;高性能&lt;/strong&gt;、&lt;strong&gt;高可用&lt;/strong&gt;和&lt;strong&gt;易于接入&lt;/strong&gt;的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p&gt;</description></item><item><title>数据库索引一览</title><link>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</link><pubDate>Thu, 10 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/db-index-summary/</guid><description>
+&lt;h2 id="数据库索引一览"&gt;数据库索引一览&lt;/h2&gt;
+&lt;p&gt;本文将为您全面、详细、精准地列出现代数据库所支持的几乎所有主流索引类型。&lt;/p&gt;
+&lt;p&gt;这份列表将涵盖从传统关系型数据库到NoSQL再到新兴的AI向量数据库的各种索引技术。每个索引类型都会包含其核心定义、对应的数据库、优缺点分析、最常见的业务使用场景，并附上在Golang中实现和使用该索引的示例代码。&lt;/p&gt;</description></item><item><title>如何设计一个砍价算法</title><link>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</link><pubDate>Thu, 03 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</guid><description>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;在一个电商平台上，砍价是一个常见的场景。&lt;/p&gt;
+&lt;p&gt;设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong&gt;基准线+随机波动&lt;/strong&gt;”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p&gt;</description></item><item><title>golang项目部署规范实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</link><pubDate>Wed, 02 Jul 2025 16:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/golang-project-deploy-rule/</guid><description>
+&lt;h2 id="go-web服务与异步任务部署最佳实践"&gt;Go Web服务与异步任务部署最佳实践&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;对于一个同时包含在线 Web/RPC 服务和离线异步脚本的 Go 项目，我们探讨其最佳的开发与部署规范。这不仅仅是一个技术选型问题，更是一个关乎系统长期健康、团队协作效率和业务扩展能力的架构决策。&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>服务治理相关实践-skywalking</title><link>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</link><pubDate>Tue, 01 Jul 2025 09:25:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/service-manage-skywalking/</guid><description>
+&lt;h2 id="skywalking-全景解析从核心逻辑到存储结构的深度剖析"&gt;SkyWalking 全景解析：从核心逻辑到存储结构的深度剖析&lt;/h2&gt;
+&lt;p&gt;在微服务架构日益盛行的今天，如何有效地观测、监控和诊断分布式系统成为了开发者和运维工程师面临的巨大挑战。Apache SkyWalking 作为一款顶级的开源应用性能监控（APM）工具，为分布式系统的可观测性提供了强大的解决方案。本文将带你全面了解 SkyWalking，深入探讨其核心业务逻辑、数据收集与串联机制，并揭示其底层的数据存储结构。&lt;/p&gt;</description></item><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;服务端通用，需要了解和掌握的知识&lt;/p&gt;
+&lt;p&gt;服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;高可用 - 冗余设计，容错处理，自动恢复&lt;/li&gt;
+&lt;li&gt;高并发 - 支持大量请求&lt;/li&gt;
+&lt;li&gt;高性能 - 快速处理单个请求，并减少资源消耗&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p&gt;</description></item></channel></rss>

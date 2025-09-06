@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>营销工具 on LX 知识库</title><link>https://namejlt.github.io/tags/%E8%90%A5%E9%94%80%E5%B7%A5%E5%85%B7/</link><description>Recent content in 营销工具 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 03 Jul 2025 11:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E8%90%A5%E9%94%80%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml"/><item><title>如何设计一个砍价算法</title><link>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</link><pubDate>Thu, 03 Jul 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/bargain-prices/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>在一个电商平台上，砍价是一个常见的场景。&lt;/p>
-&lt;p>设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong>基准线+随机波动&lt;/strong>”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p></description></item></channel></rss>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;在一个电商平台上，砍价是一个常见的场景。&lt;/p&gt;
+&lt;p&gt;设计一个砍价算法，可以分为几个核心步骤。这个算法的设计思路是“&lt;strong&gt;基准线+随机波动&lt;/strong&gt;”，以确保金额总体呈规律递减，但每次又不完全相同，增加趣味性。&lt;/p&gt;</description></item></channel></rss>

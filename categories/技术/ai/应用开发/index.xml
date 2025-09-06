@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/AI/应用开发 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/</link><description>Recent content in 技术/AI/应用开发 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 25 May 2025 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 应用开发-003 AI辅助编程工具 cursor</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</link><pubDate>Sun, 25 May 2025 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/003-ai-code-cursor/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI编程工具正经历从&amp;quot;代码补全&amp;quot;到&amp;quot;全局智能协作&amp;quot;的飞跃。Cursor作为新一代AI驱动的代码编辑器，集成了多模型、全局索引、自然语言编辑、规则驱动等创新能力，成为开发者高效协作与创新的强力引擎。&lt;/p></description></item><item><title>AI 应用开发-002 PROMPT 提示词</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</link><pubDate>Thu, 22 May 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>Prompt工程是AI应用开发中的关键技术，它关注如何通过优化提示词来提升AI模型的输出质量。本文将从原理、关键原则到实战技巧，全面介绍Prompt工程。&lt;/p></description></item><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p></description></item><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>AI应用开发是一项复杂的任务，需要深入理解人工智能的原理和应用。以下是学习步骤，帮助您入门AI应用开发。&lt;/p>
-&lt;p>在之后的篇章中，会从概念到实战，逐步引导您掌握AI应用开发的各个方面。&lt;/p></description></item></channel></rss>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI编程工具正经历从&amp;quot;代码补全&amp;quot;到&amp;quot;全局智能协作&amp;quot;的飞跃。Cursor作为新一代AI驱动的代码编辑器，集成了多模型、全局索引、自然语言编辑、规则驱动等创新能力，成为开发者高效协作与创新的强力引擎。&lt;/p&gt;</description></item><item><title>AI 应用开发-002 PROMPT 提示词</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</link><pubDate>Thu, 22 May 2025 16:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/002-prompt/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;Prompt工程是AI应用开发中的关键技术，它关注如何通过优化提示词来提升AI模型的输出质量。本文将从原理、关键原则到实战技巧，全面介绍Prompt工程。&lt;/p&gt;</description></item><item><title>AI 应用开发-001 API Function Call</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</link><pubDate>Tue, 20 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/001-api-function-call/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI应用开发最基础的是如何调用大模型API，以及如何使用Function Call机制。在这一阶段中，学习者将学习如何使用Python调用大模型API，例如使用DashScope平台完成情感分析、表格提取等任务，同时理解Function Call机制在工具调用中的关键作用。&lt;/p&gt;</description></item><item><title>AI 应用开发入门指南</title><link>https://namejlt.github.io/posts/tech/ai/app-dev/start/</link><pubDate>Thu, 15 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/app-dev/start/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;AI应用开发是一项复杂的任务，需要深入理解人工智能的原理和应用。以下是学习步骤，帮助您入门AI应用开发。&lt;/p&gt;
+&lt;p&gt;在之后的篇章中，会从概念到实战，逐步引导您掌握AI应用开发的各个方面。&lt;/p&gt;</description></item></channel></rss>

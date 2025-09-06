@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>调度系统 on LX 知识库</title><link>https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/</link><description>Recent content in 调度系统 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 13 Jun 2025 11:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml"/><item><title>如何快速设计一个任务调度系统</title><link>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</link><pubDate>Fri, 13 Jun 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/task-job/</guid><description>
-&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
-这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p></description></item></channel></rss>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;现有业务中存在很多指定时间执行和循环时间执行的任务，这些任务需要被调度执行，并且需要被管理，比如查看任务状态，查看任务日志，查看任务执行时间，查看任务执行结果等等。
+这里需要一个任务调度系统去实现它，而一个功能完备的任务调度系统如何快速实现？&lt;/p&gt;</description></item></channel></rss>

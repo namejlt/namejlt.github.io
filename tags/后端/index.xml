@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>后端 on LX 知识库</title><link>https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/</link><description>Recent content in 后端 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 15 May 2025 10:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>后端常用技术总结</title><link>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</link><pubDate>Thu, 15 May 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/backend-summary/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>服务端通用，需要了解和掌握的知识&lt;/p>
-&lt;p>服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p>
-&lt;ul>
-&lt;li>高可用 - 冗余设计，容错处理，自动恢复&lt;/li>
-&lt;li>高并发 - 支持大量请求&lt;/li>
-&lt;li>高性能 - 快速处理单个请求，并减少资源消耗&lt;/li>
-&lt;/ul>
-&lt;p>很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p></description></item></channel></rss>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;服务端通用，需要了解和掌握的知识&lt;/p&gt;
+&lt;p&gt;服务端提供稳定、可靠的服务，给用户快速的体验，保存用户数据，返回用户数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;高可用 - 冗余设计，容错处理，自动恢复&lt;/li&gt;
+&lt;li&gt;高并发 - 支持大量请求&lt;/li&gt;
+&lt;li&gt;高性能 - 快速处理单个请求，并减少资源消耗&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;很多东西都是共性，且长时间不变的，需要去绝对掌握&lt;/p&gt;</description></item></channel></rss>

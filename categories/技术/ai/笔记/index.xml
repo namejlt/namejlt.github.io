@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/AI/笔记 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E7%AC%94%E8%AE%B0/</link><description>Recent content in 技术/AI/笔记 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 26 Jun 2025 17:50:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 笔记-大模型常见名词以及关系</title><link>https://namejlt.github.io/posts/tech/ai/note/ai-word/</link><pubDate>Thu, 26 Jun 2025 17:50:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/ai-word/</guid><description>
-&lt;h2 id="名词解释">名词解释&lt;/h2>
-&lt;p>我们可以将这些名词想象成一个金字塔结构，从顶层的应用概念到底层的核心技术，逐一解析。&lt;/p>
-&lt;h3 id="金字塔顶层概念与应用-concepts--applications">金字塔顶层：概念与应用 (Concepts &amp;amp; Applications)&lt;/h3>
-&lt;hr>
-&lt;h4 id="1-生成式ai-generative-ai">1. &lt;strong>生成式AI (Generative AI)&lt;/strong>&lt;/h4>
-&lt;ul>
-&lt;li>&lt;strong>名词解释&lt;/strong>：
-生成式AI是一类人工智能的总称，它的核心能力是&lt;strong>创造和生成全新的、原创的内容&lt;/strong>，而不是仅仅做分析、分类或识别。这些内容可以是文本、图片、音频、代码、视频甚至是三维模型。&lt;/li>
-&lt;li>&lt;strong>例子&lt;/strong>：
-&lt;ul>
-&lt;li>输入“一只穿着宇航服的猫在月球上”，生成一张对应的图片（如Midjourney, Stable Diffusion）。&lt;/li>
-&lt;li>输入“帮我写一首关于夏天的诗”，生成一首诗（如GPT系列）。&lt;/li>
-&lt;li>输入一段旋律，生成完整的乐曲。&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h4 id="2-大语言模型-large-language-model-llm">2. &lt;strong>大语言模型 (Large Language Model, LLM)&lt;/strong>&lt;/h4>
-&lt;ul>
-&lt;li>&lt;strong>名词解释&lt;/strong>：
-大语言模型是生成式AI在&lt;strong>自然语言处理（NLP）&lt;strong>领域最重要、最成功的应用。它特指那些在海量文本数据上进行训练、拥有巨量参数（通常在数十亿到数万亿之间）并能够理解和生成人类语言的模型。LLM的核心任务是&lt;/strong>预测文本序列中下一个词的概率&lt;/strong>。&lt;/li>
-&lt;li>&lt;strong>与生成式AI的关系&lt;/strong>：
-&lt;strong>LLM是生成式AI的一个子集和典型代表&lt;/strong>。可以说，生成式AI是“属”，LLM是“种”。所有LLM都是生成式AI，但生成式AI还包括图像生成模型、音频生成模型等。&lt;/li>
-&lt;/ul>
-&lt;h3 id="金字塔中层模型架构与训练方法-architecture--training">金字塔中层：模型架构与训练方法 (Architecture &amp;amp; Training)&lt;/h3>
-&lt;p>这一层解释了LLM是如何构建和训练出来的。&lt;/p></description></item><item><title>AI 笔记-本地大模型部署</title><link>https://namejlt.github.io/posts/tech/ai/note/local-llm/</link><pubDate>Thu, 22 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/local-llm/</guid><description>
-&lt;h2 id="概述">概述&lt;/h2>
-&lt;p>本文主要简述本地部署大模型以及使用。&lt;/p>
-&lt;p>本地部署大模型不仅可以保护数据隐私，还能降低API调用成本，减少网络延迟，并且在离线环境中使用。本文将详细介绍多种本地部署大模型的方法、步骤、验证过程以及适用场景，帮助读者成功在本地环境中运行自己的大语言模型。&lt;/p></description></item></channel></rss>
+&lt;h2 id="名词解释"&gt;名词解释&lt;/h2&gt;
+&lt;p&gt;我们可以将这些名词想象成一个金字塔结构，从顶层的应用概念到底层的核心技术，逐一解析。&lt;/p&gt;
+&lt;h3 id="金字塔顶层概念与应用-concepts--applications"&gt;金字塔顶层：概念与应用 (Concepts &amp;amp; Applications)&lt;/h3&gt;
+&lt;hr&gt;
+&lt;h4 id="1-生成式ai-generative-ai"&gt;1. &lt;strong&gt;生成式AI (Generative AI)&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;名词解释&lt;/strong&gt;：
+生成式AI是一类人工智能的总称，它的核心能力是&lt;strong&gt;创造和生成全新的、原创的内容&lt;/strong&gt;，而不是仅仅做分析、分类或识别。这些内容可以是文本、图片、音频、代码、视频甚至是三维模型。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;例子&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;输入“一只穿着宇航服的猫在月球上”，生成一张对应的图片（如Midjourney, Stable Diffusion）。&lt;/li&gt;
+&lt;li&gt;输入“帮我写一首关于夏天的诗”，生成一首诗（如GPT系列）。&lt;/li&gt;
+&lt;li&gt;输入一段旋律，生成完整的乐曲。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-大语言模型-large-language-model-llm"&gt;2. &lt;strong&gt;大语言模型 (Large Language Model, LLM)&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;名词解释&lt;/strong&gt;：
+大语言模型是生成式AI在&lt;strong&gt;自然语言处理（NLP）&lt;strong&gt;领域最重要、最成功的应用。它特指那些在海量文本数据上进行训练、拥有巨量参数（通常在数十亿到数万亿之间）并能够理解和生成人类语言的模型。LLM的核心任务是&lt;/strong&gt;预测文本序列中下一个词的概率&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;与生成式AI的关系&lt;/strong&gt;：
+&lt;strong&gt;LLM是生成式AI的一个子集和典型代表&lt;/strong&gt;。可以说，生成式AI是“属”，LLM是“种”。所有LLM都是生成式AI，但生成式AI还包括图像生成模型、音频生成模型等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="金字塔中层模型架构与训练方法-architecture--training"&gt;金字塔中层：模型架构与训练方法 (Architecture &amp;amp; Training)&lt;/h3&gt;
+&lt;p&gt;这一层解释了LLM是如何构建和训练出来的。&lt;/p&gt;</description></item><item><title>AI 笔记-本地大模型部署</title><link>https://namejlt.github.io/posts/tech/ai/note/local-llm/</link><pubDate>Thu, 22 May 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/ai/note/local-llm/</guid><description>
+&lt;h2 id="概述"&gt;概述&lt;/h2&gt;
+&lt;p&gt;本文主要简述本地部署大模型以及使用。&lt;/p&gt;
+&lt;p&gt;本地部署大模型不仅可以保护数据隐私，还能降低API调用成本，减少网络延迟，并且在离线环境中使用。本文将详细介绍多种本地部署大模型的方法、步骤、验证过程以及适用场景，帮助读者成功在本地环境中运行自己的大语言模型。&lt;/p&gt;</description></item></channel></rss>

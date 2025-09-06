@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hugo on LX 知识库</title><link>https://namejlt.github.io/tags/hugo/</link><description>Recent content in Hugo on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 16 May 2025 09:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml"/><item><title>hugo源码阅读-01 开篇</title><link>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</link><pubDate>Fri, 16 May 2025 09:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/readcode/hugo/01start/</guid><description>
-&lt;p>Hugo 是目前世界上最快的网站构建框架之一，也是最受欢迎的开源静态站点生成器之一。让我们通过源码阅读来深入了解这个优秀的项目。&lt;/p>
-&lt;h2 id="项目简介">项目简介&lt;/h2>
-&lt;p>Hugo 是使用 Go 语言开发的开源静态站点生成器，在 &lt;a href="https://github.com/gohugoio/hugo/blob/master/LICENSE">Apache License 2.0&lt;/a> 许可下发布。&lt;/p></description></item></channel></rss>
+&lt;p&gt;Hugo 是目前世界上最快的网站构建框架之一，也是最受欢迎的开源静态站点生成器之一。让我们通过源码阅读来深入了解这个优秀的项目。&lt;/p&gt;
+&lt;h2 id="项目简介"&gt;项目简介&lt;/h2&gt;
+&lt;p&gt;Hugo 是使用 Go 语言开发的开源静态站点生成器，在 &lt;a href="https://github.com/gohugoio/hugo/blob/master/LICENSE"&gt;Apache License 2.0&lt;/a&gt; 许可下发布。&lt;/p&gt;</description></item></channel></rss>

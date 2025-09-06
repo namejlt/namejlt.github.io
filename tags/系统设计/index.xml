@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>系统设计 on LX 知识库</title><link>https://namejlt.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/</link><description>Recent content in 系统设计 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 18 Aug 2025 18:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/index.xml" rel="self" type="application/rss+xml"/><item><title>SSO相关设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</link><pubDate>Mon, 18 Aug 2025 18:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/sso-system/</guid><description>
-&lt;h2 id="sso设计">SSO设计&lt;/h2>
-&lt;h3 id="一-sso-核心设计方案">一、 SSO 核心设计方案&lt;/h3>
-&lt;p>单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p></description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
-&lt;h2 id="登录设计">登录设计&lt;/h2>
-&lt;p>本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p>
-&lt;h3 id="用户登录体系的核心目标">用户登录体系的核心目标&lt;/h3>
-&lt;p>在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p></description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
-&lt;h2 id="摘要">摘要&lt;/h2>
-&lt;p>本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong>聚合收单&lt;/strong>、&lt;strong>批量付款&lt;/strong>、&lt;strong>内部记账&lt;/strong>和&lt;strong>自动化对账清算&lt;/strong>。设计遵循业界领先的实践，强调系统的&lt;strong>高可用&lt;/strong>、&lt;strong>高一致性&lt;/strong>、&lt;strong>安全&lt;/strong>与&lt;strong>可扩展性&lt;/strong>，并采用微服务架构实现功能解耦。&lt;/p></description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
-&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p>
-&lt;p>这套设计旨在实现&lt;strong>集中化管理&lt;/strong>、&lt;strong>高性能&lt;/strong>、&lt;strong>高可用&lt;/strong>和&lt;strong>易于接入&lt;/strong>的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p></description></item></channel></rss>
+&lt;h2 id="sso设计"&gt;SSO设计&lt;/h2&gt;
+&lt;h3 id="一-sso-核心设计方案"&gt;一、 SSO 核心设计方案&lt;/h3&gt;
+&lt;p&gt;单点登录（Single Sign-On，简称 SSO）的核心思想是“一次登录，处处通行”。用户只需在独立的身份提供商（IdP）登录一次，就可以访问所有相互信任的业务应用（SP），无需在每个应用中重复输入用户名和密码。&lt;/p&gt;</description></item><item><title>登录流程的设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</link><pubDate>Mon, 18 Aug 2025 11:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/auth-login/</guid><description>
+&lt;h2 id="登录设计"&gt;登录设计&lt;/h2&gt;
+&lt;p&gt;本文详细剖析用户登录设计方案，涵盖本地登录、第三方授权登录的最佳实践、核心原理、优缺点，并对未来发展趋势进行展望。&lt;/p&gt;
+&lt;h3 id="用户登录体系的核心目标"&gt;用户登录体系的核心目标&lt;/h3&gt;
+&lt;p&gt;在深入技术细节之前，我们首先要明确用户登录体系设计的核心目标：&lt;/p&gt;</description></item><item><title>支付系统设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</link><pubDate>Mon, 21 Jul 2025 22:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/payment-service/</guid><description>
+&lt;h2 id="摘要"&gt;摘要&lt;/h2&gt;
+&lt;p&gt;本方案旨在设计一个支持全球多PSP（Payment Service Provider）的统一支付平台。平台核心功能包括&lt;strong&gt;聚合收单&lt;/strong&gt;、&lt;strong&gt;批量付款&lt;/strong&gt;、&lt;strong&gt;内部记账&lt;/strong&gt;和&lt;strong&gt;自动化对账清算&lt;/strong&gt;。设计遵循业界领先的实践，强调系统的&lt;strong&gt;高可用&lt;/strong&gt;、&lt;strong&gt;高一致性&lt;/strong&gt;、&lt;strong&gt;安全&lt;/strong&gt;与&lt;strong&gt;可扩展性&lt;/strong&gt;，并采用微服务架构实现功能解耦。&lt;/p&gt;</description></item><item><title>通用多语言（i18n）服务设计</title><link>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</link><pubDate>Wed, 16 Jul 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/i18n-system/</guid><description>
+&lt;h2 id="需求"&gt;需求&lt;/h2&gt;
+&lt;p&gt;面向国际市场，IT系统需提供多语言服务，一个通用的多语言服务设计比较重要。&lt;/p&gt;
+&lt;p&gt;这套设计旨在实现&lt;strong&gt;集中化管理&lt;/strong&gt;、&lt;strong&gt;高性能&lt;/strong&gt;、&lt;strong&gt;高可用&lt;/strong&gt;和&lt;strong&gt;易于接入&lt;/strong&gt;的目标，并提供一个生产可用的 Golang SDK 详细示例。&lt;/p&gt;</description></item></channel></rss>
