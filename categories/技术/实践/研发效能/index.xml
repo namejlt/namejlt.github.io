@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术/实践/研发效能 on LX 知识库</title><link>https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/</link><description>Recent content in 技术/实践/研发效能 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 18 Sep 2025 13:50:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/index.xml" rel="self" type="application/rss+xml"/><item><title>灰度发布实践</title><link>https://namejlt.github.io/posts/tech/practice/devops/canary-release/</link><pubDate>Thu, 18 Sep 2025 13:50:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/devops/canary-release/</guid><description>
+&lt;h2 id="灰度发布实践"&gt;灰度发布实践&lt;/h2&gt;
+&lt;p&gt;灰度发布通常用来渐进式地将流量从旧版本切换到新版本，以验证新版本的稳定性和性能。&lt;/p&gt;
+&lt;p&gt;我们来详细讲解在Kubernetes（K8s）中实施灰度发布的完整流程。这篇解答将覆盖&lt;strong&gt;核心概念、不同实现方式、研发层面的具体实操、以及如何通过自研CD程序调用K8s API来自动化灰度发布和验证&lt;/strong&gt;。&lt;/p&gt;</description></item><item><title>研发效能工程实践</title><link>https://namejlt.github.io/posts/tech/practice/devops/devops-system/</link><pubDate>Thu, 18 Sep 2025 13:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/devops/devops-system/</guid><description>
+&lt;h2 id="研发效能工程实践"&gt;研发效能工程实践&lt;/h2&gt;
+&lt;p&gt;本文是一个研发效能体系建设方案&lt;/p&gt;
+&lt;p&gt;这是一个系统性工程，旨在将研发过程从“手工作坊”模式转变为“现代化工业生产”模式，核心目标就是&lt;strong&gt;降本增效&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;以下我将从 &lt;strong&gt;全局能力、平台搭建、&lt;/strong&gt; 和 &lt;strong&gt;渐进式实施&lt;/strong&gt; 三个方面进行详细阐述。&lt;/p&gt;</description></item></channel></rss>
