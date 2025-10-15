@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kafka on LX 知识库</title><link>https://namejlt.github.io/tags/kafka/</link><description>Recent content in Kafka on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 15 Oct 2025 10:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/kafka/index.xml" rel="self" type="application/rss+xml"/><item><title>kafka事务机制探讨和使用</title><link>https://namejlt.github.io/posts/tech/practice/backend/kafka-transaction/</link><pubDate>Wed, 15 Oct 2025 10:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/kafka-transaction/</guid><description>
+&lt;h2 id="kafka事务机制探讨和使用"&gt;kafka事务机制探讨和使用&lt;/h2&gt;
+&lt;p&gt;本文将从业务场景的最佳实践出发，深入剖析 Kafka 的事务机制，包括其核心原理、Go 语言的实现示例、方案的优缺点以及可行的替代方案。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="一kafka-事务机制为恰好一次语义而生"&gt;一、Kafka 事务机制：为“恰好一次”语义而生&lt;/h3&gt;
+&lt;p&gt;在分布式系统中，我们经常追求“恰好一次”（Exactly-Once）的消息处理语义，以确保数据既不重复也不丢失。在实践中，这通常意味着：&lt;/p&gt;</description></item></channel></rss>

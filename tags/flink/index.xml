@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Flink on LX 知识库</title><link>https://namejlt.github.io/tags/flink/</link><description>Recent content in Flink on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Wed, 15 Oct 2025 10:30:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/flink/index.xml" rel="self" type="application/rss+xml"/><item><title>flink实践</title><link>https://namejlt.github.io/posts/tech/practice/backend/flink-practice/</link><pubDate>Wed, 15 Oct 2025 10:30:00 +0800</pubDate><guid>https://namejlt.github.io/posts/tech/practice/backend/flink-practice/</guid><description>
+&lt;h2 id="flink实践"&gt;flink实践&lt;/h2&gt;
+&lt;p&gt;本文将从业界最佳实践的角度，详细分析您提出的关于 Apache Flink 的几个核心问题，并提供相应的 Golang 代码示例和流程图。&lt;/p&gt;
+&lt;h3 id="核心摘要"&gt;&lt;strong&gt;核心摘要&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;Apache Flink 是一个为分布式、高性能、高可用、高精度的流处理应用程序设计的开源框架和分布式处理引擎。其核心优势在于其强大的流处理能力、状态管理和事件时间处理机制。在现代数据架构中，Flink 常常作为实时数据处理的核心引擎，与 Kafka、Hadoop 生态、各类数据库等紧密集成。&lt;/p&gt;</description></item></channel></rss>
