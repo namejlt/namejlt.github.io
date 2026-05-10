@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>平滑发布 on LX 知识库</title><link>https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/</link><description>Recent content in 平滑发布 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 10 May 2026 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/index.xml" rel="self" type="application/rss+xml"/><item><title>优雅上下线与平滑发布如何设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/graceful-shutdown-rolling-update/</link><pubDate>Sun, 10 May 2026 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/graceful-shutdown-rolling-update/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;微服务发布新版本时，如何保证正在处理的请求不被中断？优雅关闭和平滑上线如何实现？K8s环境下如何配置探针和生命周期钩子？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;服务上下线看似简单，但在生产环境中，一次不当的发布可能导致请求失败、数据丢失。优雅上下线是保证服务可用性的最后一道防线。&lt;/p&gt;</description></item></channel></rss>

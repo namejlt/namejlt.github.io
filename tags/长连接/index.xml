@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>长连接 on LX 知识库</title><link>https://namejlt.github.io/tags/%E9%95%BF%E8%BF%9E%E6%8E%A5/</link><description>Recent content in 长连接 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 10 May 2026 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E9%95%BF%E8%BF%9E%E6%8E%A5/index.xml" rel="self" type="application/rss+xml"/><item><title>WebSocket长连接系统如何设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/websocket-long-connection/</link><pubDate>Sun, 10 May 2026 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/websocket-long-connection/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;即时通讯、实时推送等场景需要WebSocket长连接。如何管理百万级长连接？连接心跳、重连、消息推送、集群广播如何设计？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;WebSocket长连接系统的核心挑战是连接管理和消息路由。单机可支撑数万连接，百万级连接需要集群化方案，且需要解决连接迁移、消息广播和状态同步问题。&lt;/p&gt;</description></item></channel></rss>

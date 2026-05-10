@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>配置中心 on LX 知识库</title><link>https://namejlt.github.io/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/</link><description>Recent content in 配置中心 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 10 May 2026 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/index.xml" rel="self" type="application/rss+xml"/><item><title>分布式配置中心如何设计与实现</title><link>https://namejlt.github.io/posts/reading/note/quesiton/distributed-config-center/</link><pubDate>Sun, 10 May 2026 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/distributed-config-center/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;微服务架构中，配置分散在各个服务中，如何集中管理、动态更新、版本回滚？基于etcd的配置中心如何实现长轮询推送和配置变更监听？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;配置中心是微服务的基础设施之一，解决了配置集中管理、动态更新和环境隔离等问题。一个生产级配置中心需要支持实时推送、版本管理、灰度发布和权限控制。&lt;/p&gt;</description></item></channel></rss>

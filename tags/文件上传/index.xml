@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>文件上传 on LX 知识库</title><link>https://namejlt.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/</link><description>Recent content in 文件上传 on LX 知识库</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 10 May 2026 19:00:00 +0800</lastBuildDate><atom:link href="https://namejlt.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.xml" rel="self" type="application/rss+xml"/><item><title>大文件分片上传与断点续传如何设计</title><link>https://namejlt.github.io/posts/reading/note/quesiton/file-chunk-upload-resume/</link><pubDate>Sun, 10 May 2026 19:00:00 +0800</pubDate><guid>https://namejlt.github.io/posts/reading/note/quesiton/file-chunk-upload-resume/</guid><description>
+&lt;h2 id="问题"&gt;问题&lt;/h2&gt;
+&lt;p&gt;大文件上传面临网络不稳定、上传超时、内存占用大等问题。如何设计分片上传和断点续传方案？如何保证上传的完整性？如何实现秒传？&lt;/p&gt;
+&lt;h2 id="回答"&gt;回答&lt;/h2&gt;
+&lt;p&gt;大文件上传是Web应用的常见需求。直接上传整个文件存在超时、内存溢出和无法续传等问题。分片上传将大文件切分为小块，逐块上传，支持并行、断点续传和秒传。&lt;/p&gt;</description></item></channel></rss>
