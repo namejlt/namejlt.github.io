@@ -97,6 +97,8 @@ pnpm dsh web --patch ./scratch-plugin/cordis.yml
 
 打开 http://127.0.0.1:3080 ，启动日志里应出现：
 
+> 命令说明：**安装版**直接用 `dsh web --patch …`；**源码 checkout** 里仓库根 `package.json` 提供了等价脚本：`"dsh": "node --import tsx/esm apps/cli/src/bin.ts"`，所以 `pnpm dsh web --patch …` 与 `pnpm start:web`（= `… bin.ts web`）走同一个入口，`pnpm dev:web` 是带 `--poll` 的客户端构建监听。源码树要求 Node `^22.19.0 || >=24`、pnpm `11.28.5`（见 `engines` / `packageManager`），首次先 `pnpm install`。端口默认 3080（`dsh-web-app` 的 patch 里是 `port: !!js ctx.webStartup.port ?? 3080`），可用 `--port` 覆盖，`port: 0` 表示交给系统分配。
+
 ```
 [hello-plugin] plugin loaded!
 ```
@@ -117,9 +119,10 @@ pnpm dsh web --patch ./scratch-plugin/cordis.yml
 └─────────────────────────────────────────┘
 ```
 
-- **插件路径必须是绝对路径**：overlay 文件不改变 loader 解析模块路径时使用的 profile 目录，相对路径会按错误的基准解析；
+- **路径三种写法，基准各不相同**：绝对路径永远安全；`./`、`../` 按**该 patch 文件所在目录**解析并转成 file URL（不是按 profile 目录，也不是按 cwd）；包名则从 `<profile>/node_modules` 往上做 Node 解析。开发期推荐绝对路径，生产 patch 推荐包名；
 - overlay 只贡献配置，**不改动磁盘上的 profile**，随时可弃，是开发期的安全沙盒；
-- 多个 `--patch` 按 argv 顺序应用，后面的胜出。
+- 多个 `--patch` 按 argv 顺序应用，后面的胜出；但**胜出的判据是"同 id 的最后一次写入"，不是行序**——行序没有加载语义（激活由服务可用性驱动）；
+- overlay 文件**不能为空、也不能只有注释**：那会让启动直接失败。要表达"什么都不加"写 `[]`。
 
 ## 四、声明依赖：inject
 
@@ -137,40 +140,61 @@ export function apply(ctx: Context) {
 }
 ```
 
-- 未声明的服务**不会**出现在 `ctx` 上，访问即 `undefined`；
+- **没 inject 就读服务会抛错，不是 `undefined`**：`ctx.tools` 这种未声明的属性读取会抛 `cannot get property "tools" without inject`（Cordis `reflect` 的原文）。这类错误常在 `apply` 第一行就炸，栈很短，很好认；
 - 服务未就绪时插件停在 PENDING，不会执行 `apply`，也不会报错；
-- 服务消失（提供方被卸载/替换）时，依赖它的插件会自动卸载，服务恢复后自动重载——**这是框架的兜底，你不需要写防御代码**。
+- 服务消失（提供方被卸载/替换）时，依赖它的插件会自动卸载，服务恢复后自动重载（epoch 重算）——**这是框架的兜底，你不需要写防御代码**。但注意：**失败过的插件也只在依赖集合再次变化时才会重试**，不是自动重试。
 
-可选依赖用 `ctx.get()` 按需查询：
+可选依赖用 `ctx.get()` 按需查询（它不做 inject 检查，未提供时返回 `undefined`）：
 
 ```ts
 export function apply(ctx: Context) {
-  const metrics = ctx.get('metrics')
+  const metrics = ctx.get('metrics')   // 默认 strict=true：只返回"提供方已 ACTIVE"的实现
   metrics?.record('plugin_loaded', 1)  // 没有 metrics 服务就静默跳过
 }
 ```
+
+> `ctx.get(name, false)` 会连"提供方还在 LOADING"的实现也返回——只有在你明确要拿半初始化对象时才这么用。
 
 ## 五、开发循环与调试
 
 ### 5.1 标准开发循环
 
 ```
-改 src/my-plugin.ts → 保存 →（HMR 自动重载 或 重启）→ 终端看日志 → Web UI 验证
+改 src/my-plugin.ts → 保存 →（等 2 秒：HMR 稳定窗口）→ HMR 重载 或 重启 → 终端看日志 → Web UI 验证
 ```
 
-开启 HMR（热模块替换）：在 `cordis.yml` 加载 `@deepseek-ai/dsh-hmr` 后，修改插件源文件会触发「卸载旧插件（清理所有注册）→ 重新加载 → 执行新 `apply`」。因为注册都是自动清理的 effect，热替换不会残留旧实例。
+关于 HMR，必须纠正一个常见误解：**"加载了 `@deepseek-ai/dsh-hmr` 就会热重载你的源码"是错的**。base 组合里这一行本来就在，但它的配置是 `root: []`：
 
 ```yaml
-# cordis.yml 追加一行即可开启（开发期推荐）
-- name: '@deepseek-ai/dsh-hmr'
+# dsh-base/cordis.patch.yml（原样）
+- id: hmr
+  name: '@deepseek-ai/dsh-hmr'
+  disabled: !!js "!ctx.get('profileContext')"
+  config:
+    root: []          # ← 只监听 profile 配置，不监听源码模块
 ```
 
-### 5.2 三件排错武器
+也就是说：**默认只热重载"配置"，不热重载"你的 .ts 源文件"**。要改源码即时生效，得像覆盖任何一行那样覆盖它：
+
+```yaml
+# 你的 overlay
+- id: hmr
+  disabled: false
+  config:
+    root: ["."]        # 模块监听目录（相对 base URL）；也可写你的插件源码目录
+    # ignored 默认 ["**/node_modules", "**/.*", "cache", "data"]
+    # debounce 默认 100ms；配置文件监听默认 awaitWriteFinish ≈ 2s
+```
+
+热替换成功时的动作为「卸载旧插件（结算所有 effect）→ 重新加载 → 执行新 `apply`」，因为注册都是自动清理的 effect，不会残留旧实例。**替换失败时不恢复旧代码**：插件被停下并报 `failed` + 加载错误，文件修好后下次重组会再导入一次（细节见 014）。
+
+### 5.2 四件排错武器
 
 | 武器 | 用法 | 能回答什么 |
 |------|------|------------|
 | `--dump-config` | `dsh --profile demo --dump-config` | 我的 patch 层到底生效了吗？按层打印最终配置 |
-| 启动日志 | 看终端输出 | 插件加载/卸载/异常 |
+| `--dump-config-schema` | `dsh --profile demo --dump-config-schema` | 这个字段到底叫什么、类型与默认值是什么 |
+| 启动日志 | 看终端输出 | 插件加载/卸载/异常（fail-loud 会带行标签） |
 | Web UI 会话 | 直接和模型对话 | 工具是否可被调用、返回是否符合预期 |
 
 `--dump-config` 会以 `# == <package>` 注释标出每一层，是排查「配置没生效」的第一工具。典型输出：
@@ -187,18 +211,20 @@ export function apply(ctx: Context) {
         greeting: 'Hi there'
 ```
 
-### 5.3 常见坑速查表（8 个）
+### 5.3 常见坑速查表（10 个）
 
 | # | 坑 | 症状 | 解法 |
 |---|----|------|------|
-| 1 | overlay 里写相对路径 | 模块解析失败 | 改绝对路径 |
-| 2 | 用了 `ctx.tools` 但没 `inject` | `Cannot read properties of undefined` | 加 `export const inject = ['tools']` |
+| 1 | 相对路径的基准猜错 | 模块解析失败 | 相对路径按 **patch 文件所在目录** 解析；生产用包名，开发用绝对路径 |
+| 2 | 用了 `ctx.tools` 但没 `inject` | `cannot get property "tools" without inject` | 加 `export const inject = ['tools']` |
 | 3 | 覆盖别人的行只写改动的键 | 配置「丢了」其他字段 | 重述该行全部键（整行替换语义） |
-| 4 | 以为改文件即时生效 | 行为没变 | 确认加载了 dsh-hmr，或重启 |
-| 5 | `Config` 导出普通对象 | 加载失败 | 必须导出 Schemastery schema（第 003 篇） |
-| 6 | 端口 3080 被占用 | Web UI 打不开 | 换端口或释放进程 |
-| 7 | 多个 overlay 顺序搞反 | 覆盖关系颠倒 | `--patch` 按 argv 顺序，后面的胜出 |
+| 4 | 以为加载了 dsh-hmr 就监听源码 | 改文件行为没变 | 覆盖 `hmr` 行并配 `root: ["."]`（默认 `root: []`） |
+| 5 | `Config` 导出普通对象 | 加载失败 / 校验报错 | 必须导出 Schemastery schema（第 003 篇） |
+| 6 | 端口 3080 被占用 | Web UI 打不开 | 换端口（`--port`）或释放进程；`port: 0` 让系统分配 |
+| 7 | 多个 overlay 顺序搞反 | 覆盖关系颠倒 | `--patch` 按 argv 顺序；**同 id 最后一次写入胜出** |
 | 8 | 从 git 安装的 TS 包加载失败 | 找不到入口 | 包需要 `prepare` 构建脚本 + 用户授权（第 010 篇） |
+| 9 | overlay 文件写成空的/只有注释 | 启动直接失败 | 写 `[]` 表示"不加任何行" |
+| 10 | 改完文件立刻判断"没生效" | 误判 | HMR 有 `debounce` 100ms + 配置文件 `awaitWriteFinish` ≈ 2s |
 
 ## 六、从 overlay 到本地 npm 包
 
@@ -258,11 +284,12 @@ pnpm add -D @deepseek-ai/cordis @deepseek-ai/dsh-tools typescript
 ## 小结
 
 - 插件 = 导出 `name` + `apply(ctx)` 的 TypeScript 模块，三种形态语义等价；
-- overlay（`--patch`）是开发期最高优先级的配置层，路径必须绝对；
-- `inject` 声明依赖，框架保证就绪、消失自卸载；
-- 排错三件套：`--dump-config`、启动日志、Web UI 会话；
+- overlay（`--patch`）是开发期最高优先级的配置层：绝对路径最稳，相对路径按 patch 文件目录解析，生产用包名；
+- `inject` 声明依赖：没 inject 读服务会抛 `cannot get property … without inject`；服务消失自动卸载，恢复自动重载（失败的重试只在依赖集合变化时发生）；
+- 排错四件套：`--dump-config`（分层配置）、`--dump-config-schema`（字段名/类型/默认值）、启动日志、Web UI 会话；
+- HMR 默认只重载配置（`root: []`），源码热替换要显式配 `root`；
 - 下一篇给插件加配置，深入 Schemastery 与四层覆盖语义。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [下一篇：003 插件配置](./deepseek-harness-dev-003.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [下一篇：003 插件配置](/posts/tech/ai/agent/deepseek-harness-dev-003/) · [原理篇参考：014 插件加载与热更新](/posts/tech/ai/agent/deepseek-harness-dev-014/)

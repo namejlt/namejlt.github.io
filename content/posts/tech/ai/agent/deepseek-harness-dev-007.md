@@ -367,15 +367,17 @@ function splitTags(tags?: string): string[] {
 
 被动捕获是记忆插件区别于普通存储工具的关键：**用户在对话里说「记住：xxx」，即使模型没有调用工具，也自动存档**。
 
-官方事件文档给出的事件名包括 `session/event`（持久化会话事件）等，并提醒：`turn/*`、`step/*`、`tool/call` 等是**持久化的会话事件类型，不是同名 Cordis 事件**，需要监听 `session/event` 并检查 `event.type`。
+先纠正两个会导致"监听不到 / 读到错东西"的事实：
 
-由于事件载荷的精确形状以当前版本为准，捕获代码采用**防御式解析**：尝试多种常见形状，全部落空就静默跳过（绝不因解析失败污染会话）。
+1. **`session/event` 的回调签名是 `(session, event)`**——第一个参数是 `Session` 对象，第二个才是事件。写成 `(event) => …` 会把 Session 当事件用，`event.type` 永远是 `undefined`（Cordis 的 `dispatch` 直接把 `[session, event]` 作为回调实参，见 `dsh-session/lib/index.js` 的发布点）。
+2. **用户消息的会话事件类型是 `user/message`**（surface 事件家族：`system/message`、`developer/message`、`user/message`、`assistant/message`、`tool/result`）。`turn/*`、`step/*`、`tool/call` 是**持久化会话事件类型，不是同名 Cordis 事件**——只能从 `session/event` 里按 `type` 过滤。
 
 ```ts
 // 在 apply() 内追加
 if (config.captureEnabled) {
-  ctx.on('session/event', (event: any) => {
-    const text = extractUserText(event)
+  ctx.on('session/event', (session, event: any) => {
+    if (!isUserMessage(event)) return          // ← 先按 type 收窄，别解析所有事件
+    const text = extractText(event)
     if (!text) return
     const m = text.match(/(?:记住|remember)[:：]\s*(.{2,200})/i)
     if (!m) return
@@ -388,26 +390,31 @@ if (config.captureEnabled) {
   })
 }
 
-/** 防御式提取用户消息文本：覆盖多种可能的载荷形状 */
-function extractUserText(event: any): string | null {
-  if (!event || typeof event !== 'object') return null
-  const type = event.type ?? event.event ?? event.name
-  const role = event.role ?? event.message?.role
-  // 宽松判定：type 命中用户消息类，或 role 为 user；两者都不满足就不关心
-  const isUserType = type ? /^(user|message|message_added|user_message)$/i.test(String(type)) : false
-  if (!isUserType && role !== 'user') return null
-  const content = event.content ?? event.text ?? event.message?.content
-  if (typeof content === 'string') return content
-  if (Array.isArray(content)) {
-    return content
-      .map((b: any) => (typeof b === 'string' ? b : b?.text ?? ''))
-      .join('')
-  }
-  return null
+/** 只认 user/message（事件类型是封闭联合，没有下划线变体） */
+function isUserMessage(event: any): boolean {
+  return event?.type === 'user/message'
+}
+
+/**
+ * user/message 的 `event.data` 就是一条 MessageBase：
+ *   { id: MessageId, role: 'user', content: readonly ContentBlock[], source: MessageSource }
+ * ContentBlock 是联合：text / image / file / reasoning / tool-call / tool-addition / tool-removal；
+ * 文本块形如 { type: 'text', text: string }。
+ */
+function extractText(event: any): string | null {
+  const content = event?.data?.content
+  if (typeof content === 'string') return content          // 兼容早期 v0 会话
+  if (!Array.isArray(content)) return null
+  return content
+    .filter((b: any) => b?.type === 'text')
+    .map((b: any) => b.text as string)
+    .join('')
 }
 ```
 
-> 工程建议：第一次接入某个事件时，**先只打印不处理**——`ctx.on('session/event', (e) => console.dir(e, { depth: 4 }))`，跑一轮真实会话看清结构，再把 `extractUserText` 收窄成精确判断。宽松匹配只适合启动期。
+> 工程建议：第一次接入某个事件时，**先只打印不处理**——`ctx.on('session/event', (session, e) => console.dir(e, { depth: 4 }))`，跑一轮真实会话看清结构。注意打印的**第一个参数是 Session**，别把 `session` 当成载荷的一部分。
+
+还有两个相关事件值得知道：`session/flush`（持久化排空时机，适合做"落盘后同步镜像"）、`agent/inbox/*`（消息被领取/丢弃，适合做"未读"语义）。它们的签名同样以各自包的 README 为准。
 
 ## 五、注入扩展点：先打印，后处理
 
@@ -551,17 +558,19 @@ test('flush 双写且 Markdown 可读', async () => {
 
 1. 给 `memory_recall` 增加 `category` 过滤参数，并更新测试；
 2. 实现 `memory_list(category?)` 工具，返回全部条目（带分页参数 `offset/limit`）；
-3. 把 `extractUserText` 收窄：先按第四节的「只打印」方案跑一轮，根据真实载荷重写为精确判断；
+3. 把 `isUserMessage` / `extractText` 收窄：先按第四节的「只打印」方案跑一轮真实会话，根据载荷形状重写为精确判断（记得打印的是 `(session, event)` 两个参数）；
 4. （进阶）实现启动时若 `memories.json` 缺失但 `MEMORY.md` 存在，则从 Markdown 重建索引（`- [id] \`tag\` content` 行的解析）。
 
 ## 小结
 
 - 记忆插件 = 三工具（结构化契约）+ 被动捕获（事件系统）+ 双写存储（JSON 权威 + MD 镜像）；
-- 事件集成第一课：**先打印后处理**，防御式解析，失败静默；
+- **`ctx.on('session/event', (session, event) => …)`：第一个参数是 Session**，写成单参数会把 Session 当事件；
+- 用户消息的事件类型是 `user/message`；`turn/*`、`step/*`、`tool/call` 是会话事件类型，不是 Cordis 事件；
+- 事件集成第一课：**先打印后处理**，再收窄为精确判断，失败静默；
 - 不确定的扩展点（注入）宁可留作开关，不照抄不确定的签名；
 - 召回打分保持简单可解释：词重叠 + 新近度半衰期；
 - 下一篇从单个插件走向架构：事件系统深水区、服务提供与三层能力拆分。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：006 实战知识库插件](./deepseek-harness-dev-006.md) · [下一篇：008 事件与服务](./deepseek-harness-dev-008.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：006 实战知识库插件](/posts/tech/ai/agent/deepseek-harness-dev-006/) · [下一篇：008 事件与服务](/posts/tech/ai/agent/deepseek-harness-dev-008/) · [原理篇参考：013 主循环与工具链路](/posts/tech/ai/agent/deepseek-harness-dev-013/)

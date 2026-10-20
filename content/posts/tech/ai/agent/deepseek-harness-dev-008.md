@@ -22,14 +22,34 @@ ctx.on('event-name', handler)   // 监听（随插件卸载自动移除）
 ctx.emit('event-name', payload) // 广播
 ```
 
-### 1.2 四种模式
+三个容易漏掉的监听器能力：
+
+```ts
+const dispose = ctx.on('event-name', handler)          // 返回注销函数：() => boolean
+ctx.on('event-name', handler, true)                    // 布尔值 = prepend 简写
+ctx.on('event-name', handler, { prepend: true })       // 插到监听器队首
+ctx.on('event-name', handler, { global: true })        // 穿透上下文过滤，也能收到子上下文的
+ctx.once('event-name', handler)                        // 首次调用后自动注销
+ctx.inject(['tools', 'llm'], (ctx) => {                // 依赖就绪后再执行这段
+  // 这里 ctx.tools / ctx.llm 一定就绪
+})
+```
+
+`ctx.inject(deps, cb)` 是"插件内的局部依赖段"：同一个 `apply` 里可以为不同能力声明不同依赖，让"工具相关部分"和"事件相关部分"分别等待各自的服务，而不是整包一起 PENDING。
+
+### 1.2 五种模式
+
+`DispatchMode` 的完整取值就是下面五种（**没有第六种**）：
 
 | 模式 | 调用 | 执行方式 | 返回值语义 |
 |------|------|----------|------------|
-| emit | `ctx.emit(name, payload)` | 所有监听器**同步**执行 | 忽略返回值 |
+| emit | `ctx.emit(name, payload)` | 所有监听器**同步**执行 | 忽略返回值；**单个监听器抛错被包裹记日志，不影响其他监听器** |
+| parallel | `await ctx.parallel(name, payload)` | 所有监听器**并发**执行并等待全部 | 无短路，收集不到"否决" |
 | bail | `ctx.bail(name, input)` | 按序执行 | 第一个非 `null/false/undefined` 的返回值成为最终结果（短路） |
 | serial | `await ctx.serial(name, input)` | 按注册序**依次 await** | 同上（异步版 bail） |
 | waterfall | `await ctx.waterfall(name, input, initial)` | 流水线 | 每个监听器包装下游返回值，**必须调 `next()`** |
+
+`emit` 与 `parallel` 的区别只有一条但很关键：**`emit` 不等异步、不收集结果、逐监听器容错**（审计/日志用它）；**`parallel` 等全部 settle**（清理、并行上报用它）。用 `emit` 去等异步副作用，是"日志打出但事情没做完"的经典原因。
 
 ```ts
 // bail：拦截式决策
@@ -72,23 +92,36 @@ declare module '@deepseek-ai/cordis' {
 
 ### 1.4 内置事件与「同名陷阱」
 
-官方文档给出的内置事件名遵循 `namespace/action` 约定：
+内置 Cordis 事件遵循 `namespace/action` 约定。插件作者最常碰的几组：
 
-```
-agent/pre-step          agent/request         agent/request-error
-tools/result            session/event
-```
+| 事件 | 模式 | 用途 | 能否改数据 |
+|------|------|------|------------|
+| `tools/pre-execute` | waterfall | 工具调用前的允许/拒绝/询问门禁（可重排） | 能否决；**不能改 `exec.arguments`** |
+| `tools/execute` | 包装层 | 环绕分发（超时/重试/指标）；唯一可替换必填 signal 的视图 | 能 |
+| `tools/post-execute` | — | 检查/替换内容或值、阻止、附加有序上下文 | 能 |
+| `tools/result` | emit | 观测**冻结**的最终结果 | 只读 |
+| `agent/pre-step` | — | 本步开始前改写输入/注入上下文 | 能（本步生效） |
+| `agent/request` | — | 补/改 provider、model、推理强度 | 能 |
+| `agent/request-error` | — | 返回 `{ kind: 'retry' }` 且不调 `next()` 可重试 | 能 |
+| `session/event` | （session 包发布） | 观察持久化会话事件 | 只读 |
+| `session/flush` | — | 持久化排空时机 | 观察 |
 
-**关键陷阱**：`turn/*`、`step/*`、`tool/call`、`tool/result`、`compaction/*` 是**持久化的会话事件类型，不是同名 Cordis 事件**。要观察它们，监听 `session/event` 并检查 `event.type`（第 007 篇的被动捕获正是这么做的）。
+**两个关键陷阱**：
+
+1. **`turn/*`、`step/*`、`tool/call`、`tool/result`、`compaction/*` 是持久化的会话事件类型，不是同名 Cordis 事件**。要观察它们，监听 `session/event` 并检查 `event.type`（第 007 篇的被动捕获正是这么做的）。
+2. **`session/event` 的回调签名是 `(session, event)`**，第一个参数是 `Session`。
 
 ```ts
-// ✅ 正确：观察会话内持久化事件
-ctx.on('session/event', (event) => {
+// ✅ 正确：观察会话内持久化事件（注意两个参数）
+ctx.on('session/event', (session, event) => {
   if (event.type === 'tool/result') { /* ... */ }
 })
 
-// ❌ 错误：tool/result 不是 Cordis 事件
+// ❌ 错误一：tool/result 不是 Cordis 事件
 ctx.on('tool/result', handler)   // 永远不会触发
+
+// ❌ 错误二：少写一个参数，event 收到的是 Session
+ctx.on('session/event', (event) => { event.type })   // undefined
 ```
 
 ### 1.5 实战：一个日志插件（官方示例拆解）
@@ -349,6 +382,16 @@ export function apply(ctx: Context) {
 
 `plugin-a` 与 `plugin-b` 各自看到自己组内的 Bash 实例，互不影响。**典型用途**：给「快速检查」和「长时间构建」配不同的 shell 超时。
 
+`isolate` 是 **Loader entry 的正式选项**，取值语义只有两种（`isolate?: Dict<true | string>`）：
+
+| 写法 | 语义 |
+|------|------|
+| `isolate: { shell: true }` | 该 entry **独享**一个 shell 域（每个 entry 各自一份实现） |
+| `isolate: { shell: 'fast' }` | 所有标了 `'fast'` 的 entry **共享**同一个 shell 域 |
+| 不写 | 沿用父上下文的解析（默认看到同一个实例） |
+
+同一个 entry 还能写 `intercept:`（给下层插件的服务注入配置），这两项都是 Loader 在 patch context 阶段应用的——所以它们只对 **patch 行**有意义，在插件的 `apply` 里要用 `ctx.isolate()` / `ctx.intercept()` 手动做。
+
 ## 五、把实战插件接进事件/服务生态
 
 前两篇的插件可以这样融入生态：
@@ -365,6 +408,9 @@ export function apply(ctx: Context) {
 |----|------|------|
 | waterfall 不调 `next()` | 流水线静默中断 | 监听器第一行先 `await next()` |
 | 监听 `tool/result` 期待触发 | 永远不触发 | 那是会话事件类型，监听 `session/event` 查 `event.type` |
+| `session/event` 只写一个参数 | `event` 拿到的是 `Session` | 签名是 `(session, event)` |
+| 用 `emit` 等异步副作用 | 日志打了但事情没做完 | 要等就用 `await ctx.parallel(...)` |
+| 服务名冲突（同一作用域两个提供者） | 后者注册失败：`service "x" has been registered at <fiber>` | 用 `isolate` 分开，或只保留一个提供者 |
 | 缓存服务引用跨窗口期使用 | 调到已卸载服务 | 用时从 `ctx` 现取；依赖框架的自动重载 |
 | 预防性拆分 | 三个包啃不动，契约还老变 | 先单包，出现第二个实现再拆 |
 | 事件名不用命名空间 | 与内置事件撞车 | `my-plugin/action` 约定 |
@@ -374,16 +420,18 @@ export function apply(ctx: Context) {
 1. 给 memory-lite 的「记忆写入」抽一个 `MemoryWriter` 服务，并写一个消费方插件在会话结束时自动写入摘要；
 2. 用 waterfall 实现一个「提示词美化」管道：三个插件依次给用户消息加前后缀，其中一个故意不调 `next()`，观察短路效果；
 3. 把 kb-lite 改造成 Definition + Provider + Consumer 三层，并写第二个 Provider（从 SQLite FTS5 读取）；
-4. 用 group 隔离给 kb-lite 配两套 storageDir，验证两个实例互不干扰。
+4. 用 group 隔离给 kb-lite 配两套 storageDir，验证两个实例互不干扰（`isolate: { storage: true }` 两行各一份；改成同一个标签则共享）。
 
 ## 小结
 
-- 事件四模式：emit / bail / serial / waterfall；waterfall 必须 `next()`；
-- 自定义事件用 `declare module Events` 加类型；注意会话事件（`session/event`）与 Cordis 事件的区别；
-- 服务 = ctx 上的命名能力：`Service` 基类提供，`inject` 必需消费，`ctx.get()` 可选消费；
+- **五种**分发模式：emit / parallel / bail / serial / waterfall；waterfall 必须 `next()`，emit 不等异步也不短路；
+- 监听器还有 `prepend`、`global`、`ctx.once()` 与 `ctx.inject(deps, cb)`（插件内分能力等待依赖）；
+- 自定义事件用 `declare module Events` 加类型；注意会话事件（`session/event`，签名 `(session, event)`）与 Cordis 事件的区别；
+- 工具流水线四个钩子各有分工：`pre-execute`（可否决、不可改参数）→ `execute`（包装层）→ `post-execute`（可替换内容/值）→ `result`（只读）；
+- 服务 = ctx 上的命名能力：`Service` 基类提供，`inject` 必需消费，`ctx.get()` 可选消费；同名唯一，隔离靠 `isolate`（entry 级或 `ctx.isolate()`）；
 - 三层拆分（Definition/Provider/Consumer）用于可替换能力，**不预防性拆分**；
 - 下一篇讲安全：策略钩子、审计与后台任务。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：007 实战记忆插件](./deepseek-harness-dev-007.md) · [下一篇：009 安全与后台任务](./deepseek-harness-dev-009.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：007 实战记忆插件](/posts/tech/ai/agent/deepseek-harness-dev-007/) · [下一篇：009 安全与后台任务](/posts/tech/ai/agent/deepseek-harness-dev-009/) · [原理篇参考：014 插件加载与热更新](/posts/tech/ai/agent/deepseek-harness-dev-014/)

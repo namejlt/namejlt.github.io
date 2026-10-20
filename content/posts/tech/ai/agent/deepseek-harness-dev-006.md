@@ -419,6 +419,8 @@ export function apply(ctx: Context, config: Config) {
           },
         ],
       },
+      // Host 本地消费方（桌面壳/CLI）读这个；内置 Web 卡片走 client 侧 renderer，
+      // 需额外用 output.presentationMeta 派生 metadata——见第 005 篇 5.1。
       presentResult: (args, value) => ({
         card: 'search',
         query: args.query,
@@ -645,4 +647,4 @@ node --test --experimental-strip-types test/*.test.ts
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：005 工具契约](./deepseek-harness-dev-005.md) · [下一篇：007 实战记忆插件](./deepseek-harness-dev-007.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：005 工具契约](/posts/tech/ai/agent/deepseek-harness-dev-005/) · [下一篇：007 实战记忆插件](/posts/tech/ai/agent/deepseek-harness-dev-007/) · [原理篇参考：013 工具调用链路](/posts/tech/ai/agent/deepseek-harness-dev-013/)

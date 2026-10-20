@@ -25,10 +25,34 @@ tags: ["AI", "Agent", "DeepSeek Harness", "插件开发", "dsh", "安全", "策�
 
 注意两个语义细节：
 
-- **内容替换不影响程序侧取值**（Code Mode 拿到的还是原值）；
+- **内容替换不影响程序侧取值**（PTC 程序拿到的还是原值）；
 - **保密策略要屏蔽或替换值本身**，而不是只改展示。
 
-> 这些扩展点的精确注册签名以 `@deepseek-ai/dsh-tools` 当前版本的扩展点参考为准。本篇把重点放在**两个 100% 稳定的落点**：基于 `tools/result` 事件的审计，以及工具化的敏感信息扫描。策略钩子部分给出设计范式与接线思路，接入时以当版参考校准。
+### 1.1 精确接线：谁在哪一步、能不能翻案
+
+`dsh-tools` 的调用流水线是**固定顺序**的，选错位置就等于写错语义：
+
+```
+tools/pre-execute  （waterfall，可重排）→ 允许/拒绝/询问
+      ↓
+已注册 guard       （ctx.tools.guard(fn)，同步、单调）→ 只能拒绝，后续监听器无法翻案
+      ↓
+tools/execute      （环绕包装）→ 超时/重试/指标；唯一可替换必填 signal 的视图
+      ↓
+tools/post-execute → 检查/替换内容或值、阻止、附加有序上下文
+      ↓
+finalizeContent    → 工具自己持有的内容收尾
+      ↓
+tools/result       （emit，只读）→ 观测冻结后的最终结果
+```
+
+三个直接影响写法的约束：
+
+- **`tools/pre-execute` 不能改写 `exec.arguments`**（有意设计，避免日志与实际运行内容脱节）。想改输入只能用 `agent/pre-step` 或参数层。
+- **guard 是"单调"的**：同步函数、只能收紧；返回理由即拒绝。红线兜底放这里，别放 `pre-execute`（那里可能被别的监听器放宽）。
+- **取消与失败都有结构化结果码**：`ABORTED_BEFORE_DISPATCH`（主体前取消）、`ABORTED`（主体后取消）、`TOOL_TIMEOUT`（包装层超时）、`UNKNOWN_TOOL`（未知工具或工具抛错）。审计时记 `result` 里的这些码，比记自然语言可靠。
+
+> 仍以 `@deepseek-ai/dsh-tools` 各版本 README 为最终依据；本篇把重点放在**两个 100% 稳定的落点**：基于 `tools/result` 事件的审计，以及工具化的敏感信息扫描。策略钩子给出设计范式与接线位置，具体签名接入时以当版 README 校准。
 
 ## 二、稳定落点一：审计日志（tools/result）
 
@@ -189,13 +213,38 @@ class GuardedShell extends ShellService {
 
 ## 四、后台任务：长工作的正确生命周期
 
-会跑很久的工具（全量重建索引、长视频转写）不该阻塞一次工具调用。官方参考给出的模式：
+会跑很久的工具（全量重建索引、长视频转写）不该阻塞一次工具调用。DSH 里的真实分层是这样的：
 
-- 需要 `run_in_background` 且由部署配置开关的工具，通过 `ctx.jobs.start()` 注册为后台任务；
-- 运行时先校验所有者和任务控制器可用，再提供任务 id、会话围栏、通用控制工具和清理钩子；
-- 注册成功返回**类型化句柄**，如 `{ kind: 'background', jobId: 'bash-1' }`；
-- 模型侧用任务终止工具、所有者销毁、服务卸载来结束任务；
-- 收集输出用任务输出工具。
+| 角色 | 包 | 说明 |
+|------|-----|------|
+| 抽象注册表 | `@deepseek-ai/dsh-jobs` | 提供 `ctx.jobs`：`list / get / read / readAt / kill / wait / remove`、`events.subscribe` |
+| 进程内实现 | `@deepseek-ai/dsh-jobs-local` | 任务真的在这个进程里跑 |
+| 提供方控制器 + 三个工具 | `@deepseek-ai/dsh-tool-jobs` | 注册 `job_output / job_list / job_kill`，并**附加 `ctx.jobs.start()` 得以启用所依赖的控制器** |
+
+关键边界（原文）：**组合里没挂 `tool-jobs` 的 agent 无法启动后台工作**——控制器正是提供方 `ctx.jobs.start()` 的开关。所以"我有 `ctx.jobs` 却 start 不了"不是 bug，是缺控制器。
+
+`start(spec)` 的完整形状（逐字核对自 npm 包 `@deepseek-ai/dsh-jobs@0.2.1-rc.2` 的 `lib/types/types.d.ts`；发行树把 `.d.ts` 剥掉了，所以只能从 npm 包或仓库源码看）：
+
+```ts
+ctx.jobs.start({
+  kind: 'index-dir',                  // id 前缀：<kind>-<16 位 uuid>
+  label: 'index ./docs',              // 模型可见的一行标签（命令、委派描述）
+  owner,                              // 可选 SessionId；省略 = 无主任务，任何调用方可见
+  toolCall: { callId, rootCallId },   // 可选；写进持久生命周期记录
+  outputLimitBytes: 64 * 1024,        // 可选；单次模型侧读取/通知的字节上限
+  output: [source],                   // 可选；注册表按自己节奏泵送的拉取源
+  run(job) {                          // 预检通过后同步调用一次
+    return {
+      cancel: (reason) => {},         // 必须同步、幂等，最终让 done 结算
+      done: Promise<JobOutcome>,      // 不得 reject（reject 会被转成 failed）
+    }
+  },
+})
+```
+
+`job` 是 `JobHandle`：`{ id, append(text, options), updateProgress(line) }`。`output` 里的每个源是 `{ channel?, read(fromByte) → { delta, nextOffset, lossy } }`——只读、可重放，由注册表推进。
+
+预检会先拒绝四类错误，且**不会留下 job id**：没有控制器（`background jobs unavailable: no job controller serves this agent (load @deepseek-ai/dsh-tool-jobs in its composition)`）、`kind`/`label` 为空串、`outputLimitBytes` 非正整数、超过每个所有者的并发上限（`maxConcurrentJobsPerOwner`）。
 
 ### 4.1 取消信号的语义（高频出错点）
 
@@ -246,7 +295,7 @@ async execute(args, exec) {
 
 ### 4.3 没有 jobs 时的降级方案
 
-当前版本若未暴露 `ctx.jobs`，用「分段 + 游标」模拟：`kb_rebuild(dir, cursor?)` 每次处理 N 个文件，返回 `nextCursor`，模型多轮调用推进。零新 API，且天然可取消（不调下一轮就停）。
+如果组合里没有 `ctx.jobs`（或没挂 `tool-jobs` 控制器），用「分段 + 游标」模拟：`kb_rebuild(dir, cursor?)` 每次处理 N 个文件，返回 `nextCursor`，模型多轮调用推进。零新 API，且天然可取消（不调下一轮就停）。**这也是给不装 jobs 的用户留的兼容路径**。
 
 ## 五、审计与合规注意事项
 
@@ -268,20 +317,21 @@ async execute(args, exec) {
 
 ## 七、练习
 
-1. 给 audit-lite 加 `session/event` 监听，记录用户消息中的「记住：」捕获次数，输出日签到审计日志；
+1. 给 audit-lite 加 `session/event` 监听（**签名 `(session, event)`**），记录用户消息（`event.type === 'user/message'`）中的「记住：」捕获次数，输出日签到审计日志；
 2. 扩展 `judge()`：支持 allowlist 配置项，并为每条规则补单测（表驱动测试）；
 3. 把 kb-lite 的 `kb_add` 目录批量入库改造成 4.3 节的「分段 + 游标」模式，并处理 `maxDocChars` 边界；
-4. （进阶）读完 `@deepseek-ai/dsh-tools` 的扩展点参考后，把 `judge()` 以 `pre-execute` 接线，验证审批 UI 行为。
+4. （进阶）把 `judge()` 以 `pre-execute` 接线，再写一条 `ctx.tools.guard()` 的红线规则，验证"guard 拒绝不可被放宽"。
 
 ## 小结
 
-- 策略与工具分离：判定器是纯函数，接线用扩展点；
+- 策略与工具分离：判定器是纯函数，接线按流水线位置选：`pre-execute`（可否决/可询问）→ `guard`（单调拒绝）→ `execute`（包装）→ `post-execute`（可替换）→ `result`（只读审计）；
 - 两个稳定落点：`tools/result` 审计 + 工具化扫描，记录侧脱敏；
+- 后台任务分层：`dsh-jobs`（抽象 `ctx.jobs`）+ `dsh-jobs-local`（实现）+ `dsh-tool-jobs`（控制器与三工具）；**没有控制器就 start 不了**；
 - 后台任务三原则：配置开关、任务自有 signal、结构化 jobId 句柄；
-- 取消语义：`exec.signal` 止等待，任务信号止工作；
+- 取消语义：`exec.signal` 止等待，任务信号止工作；失败/取消看结构化结果码，别解析文案；
 - 安全默认值：fail-safe 拒绝、最小采集、密钥不进 patch；
 - 下一篇收官：打包发布、测试策略与最佳实践清单。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：008 事件与服务](./deepseek-harness-dev-008.md) · [下一篇：010 打包发布](./deepseek-harness-dev-010.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：008 事件与服务](/posts/tech/ai/agent/deepseek-harness-dev-008/) · [下一篇：010 打包发布](/posts/tech/ai/agent/deepseek-harness-dev-010/) · [原理篇参考：013 主循环与工具链路](/posts/tech/ai/agent/deepseek-harness-dev-013/)

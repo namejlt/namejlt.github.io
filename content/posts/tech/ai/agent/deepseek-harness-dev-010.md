@@ -74,9 +74,11 @@ kb-lite/
 
 三个关键点：
 
-1. **`dsh.bundle.patch`** 指向本包贡献的 patch 文件；
-2. **`engines.dsh`** 用 SemVer 范围声明支持的 DSH 版本——安装与启动会拒绝不满足范围的包（没有该字段时退而检查 `@deepseek-ai/dsh*` peer 依赖范围）；
+1. **`dsh.bundle.patch`** 指向本包贡献的 patch 文件（也可以是**有序列表**，同一层内按序应用）；
+2. **`engines.dsh`** 用 SemVer 范围声明支持的 DSH 版本——**声明了它就忽略 peer 范围**；没有该字段时才退而检查 `@deepseek-ai/dsh*` peer 依赖范围。空串/非法范围 = 不兼容；
 3. **共享实例的 dsh 包**（cordis/dsh-tools）同时放 `peerDependencies` 与 `devDependencies`：peer 保证运行时用宿主副本，dev 供类型检查与独立测试。
+
+> 还有三个 manifest 字段值得知道：`dsh.manifestVersion: 1`（格式版本，与 npm 版本、Session 格式版本互不相干；**类型包本身不强制检查**，实际门禁在启动器侧）、`dsh.profile.bundles`（只属于 profile，bundle 不能声明）、`dsh.client`（浏览器侧入口，见第 015 篇）。
 
 ### 2.3 cordis.patch.yml
 
@@ -100,6 +102,29 @@ patch 也接受有序文件列表（同一层按序应用）：
 ### 2.4 没有 dsh.bundle 的包
 
 仍然可以安装，但只作为普通依赖：`dsh plugin` 会打印警告，不激活任何层。**供其他插件 import 的库**（如 Service Definition 包）就用这种格式。
+
+### 2.5 版本不兼容时：显式豁免与"要不要重启"
+
+被兼容性门禁拒绝时，你会看到带 `incompatible-version` 错误码的诊断（每条含 `name`、`version`、`runtimeVersion` 与未满足的 `requirements`，键为 `engines.dsh` 或某个 DSH peer 包名）。CLI 会直接打印可执行的豁免命令：
+
+```sh
+dsh plugin --profile demo version-exemptions                     # 看已授的豁免
+dsh plugin --profile demo allow-version pkg@1.2.3 \
+    --dsh-version 0.2.1-rc.2 --accept-risk                       # 授一条（会先打印风险警告）
+dsh plugin --profile demo revoke-version pkg@1.2.3 --dsh-version 0.2.1-rc.2
+```
+
+豁免**在下一次组合时生效**：在线 profile 立刻重组挂载（报告 `applied`）；仅启动型 profile 要重启（报告 `restart-required`）。
+
+至于重启：`dsh plugin` 的每个结果都可能带 `restart-required` 与 `restartReason`，取值是下面三类之一——
+
+| `restartReason` | 含义 |
+|-----------------|------|
+| `no-hmr` | 该 profile 没有 HMR（如 headless/sdk/acp），改动只能等重启 |
+| `package-moved` | 已安装包解析到了别的目录，或运行时映射变化导致发布被拒 |
+| HMR 待处理原因 | 有变化模块只能在重启时加载 |
+
+这解释了 010 后面那句常被误读的话：**"没有 HMR 时，安装/删除可能报告 restart-required"不是失败，而是"已保存、待重启生效"**。
 
 ## 三、安装进 Profile 与四层加载顺序复盘
 
@@ -199,6 +224,12 @@ dsh plugin add github:you/kb-lite#<sha>
 
 让后续推送无法悄悄改变实际运行的内容。不想让用户做授权，就分发构建产物（npm 或 tarball）。
 
+### 4.2 git 安装前还会做一次连通性检查
+
+`dsh plugin` 在启动 pnpm 之前会先 `git ls-remote` 探测仓库（用 profile 目录的 Git 与代理配置，禁用凭据助手与认证提示），超时由 `githubConnectionTimeoutMs` 控制（默认 **5000ms**，只限这次检查，不限下载/构建）。只有网络失败与超时会中止安装，其余失败（认证、仓库不存在等）交给 pnpm 处理——所以"认证失败"报的是 pnpm 的错误，别去查这个超时。
+
+注册表包、本地路径、tarball 与其他 Git 主机都跳过这项检查。
+
 ## 五、测试策略
 
 社区高质量插件（如 `Nicholaskin/vision-exp-tile` 111 项单测）的共识是三层：
@@ -258,30 +289,39 @@ dsh --profile smoke &   # 启动后让模型调一次 kb_search，确认注册�
 **工具（005）**
 
 8. description 写场景与边界，不写实现；
-9. 参数扁平优先，结构化数据用 JSON 字符串参数；
+9. 参数优先扁平；需要结构化参数时用 DSL 的 `object`/`array`/`oneOf`，别退化成 JSON 字符串（只有演示领域错误处理时才用字符串 + 手动 `JSON.parse`）；
 10. 返回规范值，人类文案归 render；
 11. 领域结果进规范值，基础设施故障才抛异常；
 12. IO 必传 `exec.signal`；
-13. render/present 纯函数，会变的数据走 `presentationMeta`。
+13. render 纯函数；会变的结果期数据用 `output.presentationMeta`；`presentCall`/`presentResult` 只服务 Host 本地消费方（Web 卡片走客户端 renderer）；
+14. `timeoutMs` 只是声明，要真超时得挂 timeout-policy 包装层。
 
 **实战（006/007）**
 
-14. 懒加载 + 单飞初始化；写后即持久化；
-15. 事件集成先打印后处理，防御式解析，失败静默；
-16. 本地存储用原子写（tmp + rename）。
+15. 懒加载 + 单飞初始化；写后即持久化；
+16. 事件集成先打印后处理，失败静默；`session/event` 的签名是 `(session, event)`，用户消息类型是 `user/message`；
+17. 本地存储用原子写（tmp + rename）。
 
 **架构（008）**
 
-17. waterfall 监听器先 `next()` 后逻辑；
-18. 会话事件走 `session/event` 查 `type`，不监听同名 Cordis 事件；
-19. 不预防性拆分；出现第二个实现再拆三层。
+18. waterfall 监听器先 `next()` 后逻辑；
+19. 会话事件走 `session/event` 查 `type`，不监听同名 Cordis 事件；
+20. 需要"等异步"就用 `parallel`，不要用 `emit`；
+21. 不预防性拆分；出现第二个实现再拆三层。
 
 **安全与交付（009/010）**
 
-20. 策略与工具分离，判定器纯函数化；日志记录侧脱敏；
-21. 后台任务：配置开关、任务自有 signal、结构化 jobId；
-22. 分发构建产物优先；git 分发锁定 commit 并理解 prepare 授权含义；
-23. 三层测试：单测 → 组装 → 冒烟安装。
+22. 策略与工具分离，判定器纯函数化；红线用 `ctx.tools.guard()`（单调拒绝），日志记录侧脱敏；
+23. 后台任务：配置开关、任务自有 signal、结构化 jobId；**没有 `dsh-tool-jobs` 控制器就 start 不了**；
+24. 分发构建产物优先；git 分发锁定 commit，并理解 `prepare` 授权 + 安装前 `git ls-remote` 连通性检查（默认 5s 超时）的含义；
+25. 三层测试：单测 → 组装 → 冒烟安装。
+
+**架构补课（011–016）**
+
+26. 发行树没有 `src/` 与 `.d.ts`，核对 API 靠 `README.zh.md` + `lib/*.js` 的 JSDoc；
+27. patch 行有 `id/name/config/disabled/inject/group/isolate/intercept` 七个字段，`isolate` 的 `true` 与字符串标签语义不同；
+28. HMR 默认只重载配置（`root: []`），源码热替换要显式配 `root`；配置项默认**不是** volatile；
+29. 有 Web UI 需求就写成双面包（`dsh.client` + 构建好的 `lib/client.js`），否则宿主侧 import 不到它。
 
 ## 八、全系列代码索引
 
@@ -292,13 +332,14 @@ dsh --profile smoke &   # 启动后让模型调一次 kb_search，确认注册�
 | 008 | `dsh-fetch` seam 三包 | monorepo：dsh-fetch / dsh-fetch-local / dsh-tool-fetch |
 | 009 | `audit-lite`（审计 + 扫描） | 独立仓库 `dsh-audit-lite` |
 | 010 | bundle 工程化配置 | 各仓库 package.json / cordis.patch.yml |
+| 011–016 | 原理篇：结构地图 / 设计哲学 / 主循环 / 加载与 HMR / 双端插件 / 全流程手册 | 无需代码，建议与主线对照阅读 |
 
 ## 九、结语
 
-回看学习路线：001 建立心智模型 → 002-004 跑通开发循环与生命周期 → 005 掌握工具契约 → 006/007 两个完整插件 → 008-009 架构与安全 → 010 交付上线。官方文档是唯一权威来源，本系列所有 API 均以其与仓库源码为准；遇到预览版接口变化时，用「先 dump / 先打印 / 读生成签名」三板斧校准，而不是照抄旧文。
+回看学习路线：001 建立心智模型 → 011/012 补齐项目结构与设计哲学 → 002-004 跑通开发循环与生命周期 → 005 掌握工具契约 → 013 看清主循环与工具链路 → 006/007 两个完整插件 → 008-009 架构与安全 → 014/015 加载、HMR 与双端插件 → 010/016 交付上线。**包级 README 与源码是唯一权威**；遇到版本漂移时，用「先 dump / 先打印 / 读包内 README」三板斧校准，而不是照抄旧文。
 
-接下来最好的练习：把 `kb-lite` 按第十篇打包发布，提 PR 进社区列表——那一刻，你就是插件生态的贡献者了。
+接下来最好的练习：把 `kb-lite` 按本篇打包发布，再回读 016 的验收清单逐条过一遍——那一刻，你就是插件生态的贡献者了。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：009 安全与后台任务](./deepseek-harness-dev-009.md) · 本篇为系列完结篇
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：009 安全与后台任务](/posts/tech/ai/agent/deepseek-harness-dev-009/) · [进阶：015 双端插件](/posts/tech/ai/agent/deepseek-harness-dev-015/) · [进阶：016 开发全流程手册](/posts/tech/ai/agent/deepseek-harness-dev-016/)

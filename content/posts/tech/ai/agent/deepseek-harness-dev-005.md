@@ -9,7 +9,7 @@ tags: ["AI", "Agent", "DeepSeek Harness", "插件开发", "dsh", "defineTool", "
 
 ## 概述
 
-工具（Tool）是模型接触世界的唯一通道，也是插件最核心的能力形态。官方教程用 20 行代码演示了最小工具；本篇把工具**当作一份合同**来拆解：模型看到什么、参数怎么校验、执行受什么约束、返回值是什么结构、界面怎么渲染——五层契约逐层讲透，外加 Code Mode 下的设计准则。学完后你写的工具，模型一用就顺。
+工具（Tool）是模型接触世界的唯一通道，也是插件最核心的能力形态。官方教程用 20 行代码演示了最小工具；本篇把工具**当作一份合同**来拆解：模型看到什么、参数怎么校验、执行受什么约束、返回值是什么结构、界面怎么渲染——五层契约逐层讲透，外加 PTC（程序化调用）模式下的设计准则。学完后你写的工具，模型一用就顺。
 
 ## 一、工具的五层契约
 
@@ -45,10 +45,10 @@ ctx.tools.register(defineTool({
 | 1 | `name` / `description` | 模型（决策） | description 是模型唯一能读到的说明书 |
 | 2 | `parameters` | 模型（填参）+ 框架（校验） | 类型、必填、说明 |
 | 3 | `execute` | 你的代码 | 领域行为、遵守 signal |
-| 4 | `output.schema` | 程序（Code Mode、调用方） | 唯一规范 JSON 值 |
+| 4 | `output.schema` | 程序（PTC 程序、调用方） | 唯一规范 JSON 值 |
 | 5 | `output.render` | 模型（读取结果） | 规范值 → 内容块 |
 
-此外还有可选的 `presentCall` / `presentResult` 负责 UI 卡片（第七节）。
+此外还有三样可选件：`presentCall` / `presentResult`（Host 本地消费方的卡片意图）、`output.presentationMeta`（派生给 Web 卡片的持久 metadata）、`timeoutMs`（仅声明）。分别见第五节与 3.4。
 
 ## 二、第 1、2 层：把工具「写说明书」写到极致
 
@@ -99,7 +99,7 @@ async execute(args) {
 }
 ```
 
-> DSL 也支持更丰富的 schema 能力（嵌套、数组等），精确语法以 `@deepseek-ai/dsh-tools` 当前版本的工具编写参考为准；本系列示例统一采用「扁平标量 + JSON 字符串」的保守组合，保证跨版本可用。
+> **DSL 的完整类型集**（`dsh-tools` README 原文）：`string`、`number`、`integer`、`boolean`、`null`、`array`、`object`、仅供作者使用的 `json`、以及恰好匹配一个分支的 `oneOf`。`InferValue` 在 16 层容器内保留精确类型，之后加宽为 `JsonValue`；原始 JSON Schema（`JsonSchemaNode`）是与 subagent/工作流/MCP 共享的协议级类型。所以嵌套对象、数组、可空字段都能直接表达，**不需要**"扁平标量 + JSON 字符串"这种绕法——本系列示例仍保留一处 JSON 字符串写法，只是为了演示领域错误处理（见 3.5）。
 
 ### 2.3 校验边界：框架管格式，你管语义
 
@@ -149,7 +149,7 @@ async execute() { return '已启动后台任务 bash-1，用 job_kill bash-1 停
 async execute() { return { kind: 'background', jobId: 'bash-1' } }
 ```
 
-Code Mode（程序化调用）下，模型写的是 `const r = await tools.start_job(...)` 这样的代码，拿到的必须是 `r.jobId`。**输出 schema 按程序化接口设计**，人类解释全部留给 render。
+Code Mode（现名 **PTC mode**，`mode: 'ptc'`；程序化调用）下，模型写的是 `const r = await tools.start_job(...)` 这样的代码，拿到的必须是 `r.jobId`。**输出 schema 按程序化接口设计**，人类解释全部留给 render。
 
 ### 3.3 错误处理的三层分类
 
@@ -160,6 +160,25 @@ Code Mode（程序化调用）下，模型写的是 `const r = await tools.start
 | 参数语义错误 | query 空白、topK ≤ 0 | 抛异常（带清晰 message） |
 
 错误信息是写给模型看的：`throw new Error('topK 必须为正整数，收到 -3')` 比 `throw new Error('bad input')` 的自我修复率高一个量级。
+
+### 3.4 三个"声明了但不会自己生效"的字段
+
+这三个字段最容易让人以为"我配了它就会工作"：
+
+| 字段 | 真实语义 | 你要做什么 |
+|------|----------|------------|
+| `timeoutMs` | **仅作声明**，注册表从不强制截止时间。要强制执行，必须挂 `@deepseek-ai/dsh-tool-call-timeout-policy` 包装层 | 长任务自己实现超时，并接 `exec.signal` |
+| `deferLoading: true` | 请求**延迟加载工具定义**；它**不**意味着存在 `tool-addition` 记录（提供方执行语义另有已知限制） | 工具很多、提示词吃不消时才用 |
+| `mode: 'ptc'` | 非原生模式要求组合里已有 `ctx.ptcRuntime`，且该语言已注册 SDK 渲染器 | 不确定就别设，默认 `native` |
+
+调用失败时的结构化错误码也值得记住（它们让"调用失败但轮次继续"成为可能）：
+
+| 错误码 | 触发 |
+|--------|------|
+| `UNKNOWN_TOOL` | 工具名不存在，或工具主体抛异常 |
+| `ABORTED_BEFORE_DISPATCH` | 工具主体开始前被取消 |
+| `ABORTED` | 主体成功后取消（只能把成功改写成取消） |
+| `TOOL_TIMEOUT` | 包装层超时（拒绝/包装层失败/工具失败/后置策略失败也保留各自更具体的结果） |
 
 ## 四、第 4、5 层：输出契约与渲染
 
@@ -187,14 +206,14 @@ output: {
 - render 是**纯函数**：同样的 `(args, value)` 永远产出同样内容块（回放依赖这一点）；
 - 人类可读性与机器可读性分离：模型看 render 的文本，程序看 schema 的值。
 
-## 五、UI 卡片：presentCall 与 presentResult
+## 五、UI 呈现：presentCall / presentResult 与 Web 卡片的真相
 
-模型内容之外，界面呈现是独立关注点。工具可用两个纯展示方法声明卡片意图：
+工具可用两个纯展示方法声明呈现意图：
 
 - `presentCall(args)`：待执行状态（参数预览）；
 - `presentResult(args, value)`：完成状态（结果预览）。
 
-返回带 `card` 标签的渲染意图，各端运行时自行映射成视图。卡片类型：
+返回带 `card` 标签的渲染意图，**给 Host 本地消费方**映射成视图。卡片类型：
 
 | 卡片 | 阶段 | 长相 | 典型使用者 |
 |------|------|------|------------|
@@ -210,7 +229,21 @@ output: {
 2. **UI 格式隔离**：终端代码块、相对化路径等 UI 专用格式不许混进模型结果；
 3. **软校验兜底**：`defineTool` 对展示路径软校验，参数损坏时回退通用卡片，**展示永远不能弄崩回放**。
 
-示例：检索工具用 search 卡片并携带截断标记——界面永远不会把截断结果当成完整结果展示。
+### 5.1 必须纠正的一个误解：Web UI 不消费 `present*`
+
+`dsh-tools` README 的原话是：
+
+> 工具可以为 **Host 本地消费方**保留纯函数 `presentCall()` 与 `presentResult()` 方法。**内置 Web Client 不消费这些值**，而是通过 `tool.call.toolview` 选择 renderer，并从**原始调用参数、结果内容、失败状态与持久 metadata** 派生 card props。
+
+所以三端各看各的：
+
+| 消费方 | 拿什么渲染 | 你要做什么 |
+|--------|-----------|------------|
+| 内置 Web 客户端 | 客户端 renderer（`tool.call.toolview`）+ 原始参数 + 内容 + 失败状态 + **持久 metadata** | 写 client 侧 renderer（第 015 篇）；**想让卡片拿到额外字段，用 `output.presentationMeta` 派生 metadata** |
+| 桌面壳 / CLI / 第三方宿主 | `presentCall` / `presentResult` 的 `card` 意图 | 写这两个纯函数 |
+| 模型 | `render()` 产出的内容块 | 写 `render`（第 4 层） |
+
+也就是说：**`presentResult` 写错不会让 Web UI 变丑，因为它根本不看**。反过来，`output.presentationMeta` 的结果会被快照进结果事件的 metadata，这才是"给 Web 卡片喂数据"的正道。
 
 ```ts
 // 示意：卡片声明为纯展示意图，具体 card 载荷结构以当前版本参考为准
@@ -224,14 +257,23 @@ presentResult: (args, value) => ({
   hits: value.hits.map(h => ({ title: h.title, snippet: h.snippet })),
   truncated: value.truncated,
 }),
+
+output: {
+  schema: { type: 'object', /* ... */ },
+  render: (_args, value) => [{ type: 'text', text: /* ... */ }],
+  // ← Web 卡片要靠这个：从规范值派生出可持久化的展示数据
+  presentationMeta: (_args, value) => ({ total: value.total, truncated: value.truncated }),
+}
 ```
 
-## 六、Code Mode / PTC：白送的程序化调用
+`presentationMeta` 在 `output` 里，签名是 `(args, value)`，返回值会被**快照**（校验后冻结）写进结果事件；它抛错会让本次调用以投影错误失败——所以别在里面做危险计算。
 
-在 Code Mode（PTC mode）下，每个可见的已注册工具都能以 `await tools.<工具名>(参数)` 直接调用，**无需额外集成**：
+## 六、PTC mode（原 Code Mode）：白送的程序化调用
+
+PTC（`mode: 'ptc'`，Programmatic Tool Calling）下，每个可见的已注册工具都能以 `await tools.<工具名>(参数)` 直接调用，**无需额外集成**：
 
 ```ts
-// 模型在 Code Mode 里写的代码
+// 模型在 PTC 程序里写的代码
 const results = await tools.kb_search({ query: '发布流程', topK: 3 })
 const titles = results.hits.map(h => h.title)
 ```
@@ -307,27 +349,33 @@ export function apply(ctx: Context) {
 
 | 坑 | 后果 | 对策 |
 |----|------|------|
-| execute 直接返回内容块数组 | 破坏 schema 契约，Code Mode 拿不到结构化值 | 返回规范值，render 转内容块 |
+| execute 直接返回内容块数组 | 破坏 schema 契约，PTC 模式拿不到结构化值 | 返回规范值，render 转内容块 |
 | 不接 `exec.signal` | 取消无效、会话卡死 | 所有 IO 传 signal |
 | 领域错误也抛异常 | 模型把「正常但空」当成故障 | 领域结果进规范值 |
 | description 写实现细节 | 模型误用/不用 | 写场景与边界 |
 | 注册后改 schema | 行为不确定 | 释放 effect 后重新注册 |
 | render 里读时钟/随机数 | 回放不一致 | 纯函数；会变的数据走 presentationMeta |
+| 指望 `timeoutMs` 生效 | 工具永不超时 | 它是声明；挂 timeout-policy 包装层 |
+| 以为 `presentResult` 能改 Web 卡片 | UI 没变化 | Web 走 client renderer + `output.presentationMeta` |
+| 把 `mode: 'ptc'` 当开关随手开 | 组合里没 `ctx.ptcRuntime` 直接失败 | 默认 `native`，确认运行时存在再开 |
 
 ## 九、练习
 
 1. 把 `greet` 改造成生产级：加 `language` 参数（en/zh）、领域错误（空名字走规范值 `{ ok: false }`）、search/generic 卡片；
 2. 给第 002 篇的定时器插件注册一个 `heartbeat_status` 工具，返回 `{ alive, lastBeatAt }`——注意 `lastBeatAt` 是「结果期事实」，思考该用 `presentationMeta` 还是直接进 schema；
-3. 在 Code Mode 下调用你自己的工具，验证 `ToolArgsMap` 推导是否准确。
+3. 在 PTC 模式下调用你自己的工具，验证 `ToolArgsMap` 推导是否准确；
+4. 故意删掉 `output.render` 看会发生什么（答案：`defineTool` 直接抛 `must declare output { schema, render, presentationMeta? }`）。
 
 ## 小结
 
-- 五层契约：身份 → 参数 → 执行 → 规范值 → 渲染，外加 presentCall/presentResult 卡片层；
-- description 是模型的说明书；参数优先扁平；语义校验自己补；
+- 五层契约：身份 → 参数 → 执行 → 规范值 → 渲染，另有 presentCall/presentResult（Host 本地消费方）与客户端 renderer（Web）两条呈现路径；
+- description 是模型的说明书；参数优先扁平；语义校验自己补；DSL 支持 `integer/null/array/object/json/oneOf` 等完整集合；
 - execute 八契约核心：只读定义、规范值、领域结果不抛异常、遵守 signal；
-- Code Mode 白送：输出 schema 就是程序化接口；
+- `timeoutMs` 只声明不执行，`deferLoading` 不等于 tool-addition，`mode` 默认 `native`；
+- **Web UI 不消费 `presentCall`/`presentResult`**；给 Web 卡片喂数据用 `output.presentationMeta`，卡片本身由 client 侧 renderer 决定；
+- PTC 模式白送程序化接口：输出 schema 就是调用契约；
 - 下一篇进入实战一：用全部契约写一个真正可用的本地知识库插件。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：004 生命周期](./deepseek-harness-dev-004.md) · [下一篇：006 实战知识库插件](./deepseek-harness-dev-006.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：004 生命周期](/posts/tech/ai/agent/deepseek-harness-dev-004/) · [下一篇：006 实战知识库插件](/posts/tech/ai/agent/deepseek-harness-dev-006/) · [原理篇参考：013 工具调用链路](/posts/tech/ai/agent/deepseek-harness-dev-013/)

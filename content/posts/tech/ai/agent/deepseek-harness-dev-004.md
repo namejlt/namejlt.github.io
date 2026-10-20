@@ -29,14 +29,16 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 | PENDING | 已声明，依赖未就绪 | 什么都别做，等着 |
 | LOADING | 依赖就绪，正在执行 `apply` | 同步初始化放这里 |
 | ACTIVE | 运行中 | 正常服务 |
-| FAILED | `apply` 抛异常 | 看日志修 bug，框架不会重试崩掉的插件 |
+| FAILED | `apply` 抛异常 | 看日志修 bug；框架**不会自动重试**，只在依赖 epoch 变化时再试（见 7.1） |
 | UNLOADING | 正在卸载、释放资源 | effect 处置器在这里跑 |
 | DISPOSED | 完全卸载 | 终态 |
+
+> 枚举真实取值：`PENDING=0, LOADING=1, ACTIVE=2, FAILED=3, DISPOSED=4, UNLOADING=5`。编号**没有**语义，别拿它做大小比较或"进度"判断。
 
 状态转换的两个驱动源：
 
 1. **依赖**：`inject` 的服务就绪 → 加载；服务消失 → 卸载，恢复后重载；
-2. **配置**：`cordis.yml` 改动（HMR）→ 卸载旧实例、加载新实例。
+2. **配置**：`cordis.yml` 改动（HMR）→ 卸载旧实例、加载新实例（volatile 字段例外，见第 003 篇）。
 
 ## 二、依赖驱动加载
 
@@ -144,7 +146,7 @@ await fiber.dispose()
 
 ### 5.1 顺序语义（重要）
 
-处置器按**注册顺序的逆序**调用；多个异步处置器**并发执行**，不保证逐个完成。
+**跨 effect** 的处置器**并发执行**（框架对它们做一次 `Promise.all`），不保证逐个完成；**同一 effect** 里返回的多个处置器则按序 `await`。精确语义见 7.2。
 
 ```ts
 // ❌ 有顺序依赖的清理拆成两个 effect：并发执行，可能撞车
@@ -210,13 +212,27 @@ export function apply(ctx: Context, config: Config) {
 | 原因 | 排查 |
 |------|------|
 | 同步初始化抛错 | 把可能失败的逻辑移到 effect 或工具 execute 内；`apply` 里只做轻量同步初始化 |
-| 访问了未 inject 的服务 | 检查 `ctx.xxx` 是否有对应 `inject` |
-| Config 校验失败 | 见第 003 篇 |
-| 模块加载错误（语法/导入） | 看启动日志堆栈 |
+| 访问了未 inject 的服务 | 检查 `ctx.xxx` 是否有对应 `inject`（报错原文是 `cannot get property "xxx" without inject`） |
+| Config 校验失败 | 见第 003 篇（`ValidationError`，`invalid config:` 开头） |
+| 模块加载错误（语法/导入） | 看启动日志堆栈；此时根本没进 `apply` |
+
+**"不会自动重试"要精确到条件**：`apply` 抛错后 Fiber 停在 FAILED 并把 epoch 置为 INACTIVE；**只有当依赖集合再次变化**——某个服务重新提供、`fiber.update()` 改配置、HMR 重组——它才会重新走 `LOADING`。所以"我修好了代码却还在 FAILED"的两种真实原因：
+
+- 改的是源码，但 HMR 没监听源码（`root: []`）；
+- 改的是配置，但改动没触发该行更新（比如改的是别的行）。
 
 设计准则：**`apply` 保持「薄」**——同步、轻量、不抛。重活放 effect / execute。
 
-### 7.2 泄漏检查清单
+### 7.2 处置器的精确语义
+
+两句容易记混的话，这里说清楚：
+
+- **不同 effect 之间：并发**。卸载时框架对所有 effect 的处置器做一次 `Promise.all`，不保证先后；
+- **同一个 effect 返回多个处置器时：串行**，按返回顺序依次 `await`。
+
+因此"有顺序依赖的清理"要么放进**同一个**处置器的函数体里（`await a(); await b()`），要么放进同一个 effect 返回的处置器数组。拆到两个 effect 里就是并发，撞车概率随负载上升。
+
+### 7.3 泄漏检查清单
 
 - [ ] 所有 `setInterval` / `setTimeout` 长任务都在 `ctx.effect` 里；
 - [ ] 所有 `process.on`（如 `SIGINT`）都已移除或包在 effect；
@@ -232,13 +248,14 @@ export function apply(ctx: Context, config: Config) {
 
 ## 小结
 
-- Fiber 六态：PENDING → LOADING → ACTIVE → UNLOADING → DISPOSED，异常落 FAILED；
-- `inject` 依赖驱动：未就绪等待，消失自卸载、恢复自重载；
+- Fiber 六态：PENDING → LOADING → ACTIVE → UNLOADING → DISPOSED，异常落 FAILED（编号无语义）；
+- `inject` 依赖驱动：未就绪等待（静默），消失自卸载、恢复自重载；
+- FAILED **不自动重试**，只在依赖 epoch 变化（服务重提供 / `update()` / HMR）时再试；
 - ctx 注册全部自动清理：`ctx.on`、`ctx.tools.register`、`ctx.llm.registerAdapter`、`ctx.effect`；
-- 有顺序依赖的清理放同一个 effect；异步处置器并发执行；
+- 处置器：跨 effect 并发（`Promise.all`）、同 effect 内按序 `await`——有顺序依赖的清理放同一个处置器里；
 - `apply` 保持薄；重活外移；用清单防泄漏；
 - 下一篇深入工具：模型真正能调用的能力长什么样。
 
 ---
 
-**系列导航**：[001 系列导读](./deepseek-harness-dev-001.md) · [上一篇：003 插件配置](./deepseek-harness-dev-003.md) · [下一篇：005 工具契约](./deepseek-harness-dev-005.md)
+**系列导航**：[001 系列导读](/posts/tech/ai/agent/deepseek-harness-dev-001/) · [上一篇：003 插件配置](/posts/tech/ai/agent/deepseek-harness-dev-003/) · [下一篇：005 工具契约](/posts/tech/ai/agent/deepseek-harness-dev-005/) · [原理篇参考：012 设计哲学](/posts/tech/ai/agent/deepseek-harness-dev-012/)
