@@ -2941,14 +2941,14 @@
 </span></span></code></pre></div></li><li><p><strong>手动触发任务</strong>: (替换 <code>YOUR_JOB_ID</code> 为你创建的任务 ID)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span>curl -X POST http://127.0.0.1:8080/api/job/YOUR_JOB_ID/trigger
 </span></span></code></pre></div></li><li><p><strong>查看任务执行日志</strong>: (替换 <code>YOUR_JOB_ID</code> 为你创建的任务 ID)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-bash data-lang=bash><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span>curl http://127.0.0.1:8080/api/job/logs/YOUR_JOB_ID
 </span></span></code></pre></div></li></ul></li></ol><p>通过以上步骤，你将能运行一个基本的、具备调度和执行能力的任务调度系统。这为后续的扩展和优化提供了基础。</p><h2 id=总结>总结</h2><p>一个任务调度系统的核心在于其能够高效、可靠地在预设时间点触发并执行各种类型的任务。我们通过 <strong>任务定义</strong>、<strong>调度器</strong>、<strong>执行器</strong> 和 <strong>调度中心</strong> 这四个主要组件，并结合 <strong>数据持久化</strong> 和 <strong>分布式协调</strong> 来实现了这一目标。</p><ul><li><p><strong>核心机制简述</strong>:</p><ul><li><strong>任务</strong>: 定义了执行逻辑、调度策略和配置，是系统的基本执行单元。</li><li><strong>调度器</strong>: 负责根据任务的调度策略（如 Cron 表达式、固定间隔）在分布式环境下（通过分布式锁保证唯一性）准确触发任务。</li><li><strong>执行器</strong>: 接收调度器指令，实际执行任务（如 HTTP 回调、Shell 命令、Go 函数），并将执行结果和日志反馈给调度中心。</li><li><strong>调度中心</strong>: 提供统一的管理界面和 API，用于任务的增删改查、执行器管理、任务日志查询和监控。</li><li><strong>数据持久化</strong>: 确保任务定义、执行日志、执行器状态等关键数据不丢失，通常使用关系型数据库。</li><li><strong>分布式协调</strong>: 通过分布式锁（如基于 Redis）保证多调度器实例环境下的任务唯一调度，以及执行器注册与心跳机制。</li></ul></li><li><p><strong>实现中的难点</strong>:</p><ol><li><strong>时间精度与并发管理</strong>: 在高并发场景下，如何保证任务调度的准时性和执行的并发限制，避免资源耗尽。</li><li><strong>分布式环境下的数据一致性</strong>: 多个调度器实例之间，以及调度器与执行器、调度中心之间的数据同步和状态一致性，防止任务重复调度或漏调。</li><li><strong>任务执行的隔离与安全性</strong>: 特别是对于 Shell 命令等类型任务，如何在执行器层面提供安全沙箱环境，防止恶意命令或资源争抢。</li><li><strong>系统容错与故障恢复</strong>: 如何设计任务失败重试机制、调度器/执行器故障时的自动发现、故障转移和数据恢复能力，保证系统的高可用性。</li><li><strong>监控与告警体系</strong>: 构建全面的监控指标（如任务成功率、失败率、执行耗时、各组件资源利用率）和及时的告警机制是确保系统稳定运行的关键。</li><li><strong>灵活的任务类型扩展</strong>: 抽象任务接口，使其能够方便地扩展新的任务类型而无需修改核心调度逻辑。</li></ol></li><li><p><strong>运行中重点关注</strong>:</p><ul><li><strong>日志</strong>: 确保任务执行日志、调度器日志和执行器日志的完整性、可追溯性，便于问题排查。</li><li><strong>监控</strong>: 实时关注任务的执行状态（成功/失败）、执行器健康状况、分布式锁的争用情况，以及各服务实例的 CPU、内存、网络等资源使用情况。</li><li><strong>告警</strong>: 对任务执行失败、超时、执行器离线、调度器异常等关键事件设置告警，并确保告警的及时性。</li><li><strong>系统负载</strong>: 监控任务总量、并发量和每个组件的负载，及时发现瓶颈。</li></ul></li><li><p><strong>后续扩展方向（类比 XXL-Job）</strong>:
-要将此基础系统扩展为像 XXL-Job 那样功能完备的企业级调度平台，可以考虑以下方向：</p><ol><li><strong>可视化管理界面</strong>: 提供直观的 Web UI，进行任务配置、执行器管理、日志查询、统计报表等。</li><li><strong>更丰富的调度策略</strong>: 支持依赖任务、子任务、生命周期钩子等高级调度能力。</li><li><strong>高级路由策略</strong>: 除了简单的随机/指定路由，可实现负载均衡、故障转移、忙碌转移、分片广播等。</li><li><strong>任务参数化与版本控制</strong>: 任务支持动态参数传递、任务模板化，以及任务版本的管理和回滚。</li><li><strong>任务分片与并行处理</strong>: 支持大任务拆分为多个子任务并行执行，提高吞吐量。</li><li><strong>权限与安全</strong>: 细粒度的用户权限控制、API 安全认证、任务执行的沙箱机制等。</li><li><strong>高可用与弹性伸缩</strong>: 更完善的调度器集群、执行器动态扩缩容，与 Kubernetes 等容器编排平台深度集成。</li><li><strong>故障转移与恢复</strong>: 自动检测故障，并进行任务的自动重试、失败回调、通知告警。</li><li><strong>数据统计与趋势分析</strong>: 提供历史数据统计、执行趋势分析，辅助运营决策。</li><li><strong>多租户支持</strong>: 允许不同团队或业务线独立管理各自的任务。</li></ol></li></ul><p>通过逐步迭代和完善这些功能，一个从零开始构建的 Golang 任务调度系统可以逐步成长为媲美 XXL-Job 的强大平台。</p></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-008/ class=nav-link title="AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分">AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-007/ class=nav-link title="AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite">AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-006/ class=nav-link title="AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite">AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-005/ class=nav-link title="AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约">AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ class=nav-link title="AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机">AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-003/ class=nav-link title="AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制">AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
+要将此基础系统扩展为像 XXL-Job 那样功能完备的企业级调度平台，可以考虑以下方向：</p><ol><li><strong>可视化管理界面</strong>: 提供直观的 Web UI，进行任务配置、执行器管理、日志查询、统计报表等。</li><li><strong>更丰富的调度策略</strong>: 支持依赖任务、子任务、生命周期钩子等高级调度能力。</li><li><strong>高级路由策略</strong>: 除了简单的随机/指定路由，可实现负载均衡、故障转移、忙碌转移、分片广播等。</li><li><strong>任务参数化与版本控制</strong>: 任务支持动态参数传递、任务模板化，以及任务版本的管理和回滚。</li><li><strong>任务分片与并行处理</strong>: 支持大任务拆分为多个子任务并行执行，提高吞吐量。</li><li><strong>权限与安全</strong>: 细粒度的用户权限控制、API 安全认证、任务执行的沙箱机制等。</li><li><strong>高可用与弹性伸缩</strong>: 更完善的调度器集群、执行器动态扩缩容，与 Kubernetes 等容器编排平台深度集成。</li><li><strong>故障转移与恢复</strong>: 自动检测故障，并进行任务的自动重试、失败回调、通知告警。</li><li><strong>数据统计与趋势分析</strong>: 提供历史数据统计、执行趋势分析，辅助运营决策。</li><li><strong>多租户支持</strong>: 允许不同团队或业务线独立管理各自的任务。</li></ol></li></ul><p>通过逐步迭代和完善这些功能，一个从零开始构建的 Golang 任务调度系统可以逐步成长为媲美 XXL-Job 的强大平台。</p></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-016/ class=nav-link title="AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册">AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-015/ class=nav-link title="AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包">AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-014/ class=nav-link title="AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新">AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-013/ class=nav-link title="AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路">AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-012/ class=nav-link title="AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象">AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-011/ class=nav-link title="AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图">AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
 <span class=button_tally>35</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=技术/ai/应用开发>技术/AI/应用开发
 <span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" title=技术/实践/后端>技术/实践/后端
 <span class=button_tally>14</span>
-</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
-<span class=button_tally>10</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" title=技术/实践/设计>技术/实践/设计
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/deepwiki/ class="post_tag button button_translucent" title=技术/源码阅读/deepwiki>技术/源码阅读/DEEPWIKI
@@ -2970,22 +2970,24 @@
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/hugo/ class="post_tag button button_translucent" title=技术/源码阅读/hugo>技术/源码阅读/HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/categories/%E7%94%9F%E6%B4%BB/%E6%8A%80%E8%83%BD/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" title=生活/技能/逻辑>生活/技能/逻辑
-<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
+<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
+<span class=button_tally>39</span>
+</a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
 <span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
-<span class=button_tally>33</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" title=大模型>大模型
 <span class=button_tally>26</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
+<span class=button_tally>19</span>
 </a><a href=https://namejlt.github.io/tags/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=应用开发>应用开发
 <span class=button_tally>19</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
-<span class=button_tally>13</span>
 </a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" title="deepseek harness">DEEPSEEK HARNESS
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" title=dsh>DSH
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=插件开发>插件开发
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
+<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" title=分布式>分布式
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/ class="post_tag button button_translucent" title=源码阅读>源码阅读
@@ -3000,12 +3002,14 @@
 <span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/ class="post_tag button button_translucent" title=数据库>数据库
 <span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
+<span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
+<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/redis/ class="post_tag button button_translucent" title=redis>REDIS
 <span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ class="post_tag button button_translucent" title=研发效能>研发效能
 <span class=button_tally>3</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
-<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" title=cursor>CURSOR
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" title=embedding>EMBEDDING
@@ -3019,6 +3023,8 @@
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" title=transformer>TRANSFORMER
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" title=事件系统>事件系统
+<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" title=可观测性>可观测性
 <span class=button_tally>2</span>
@@ -3038,6 +3044,8 @@
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" title=a2a>A2A
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" title="agent loop">AGENT LOOP
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" title=api网关>API网关
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" title=bm25>BM25
@@ -3050,8 +3058,6 @@
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" title=flink>FLINK
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" title=hugo>HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=id生成>ID生成
@@ -3061,6 +3067,8 @@
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" title=kafka>KAFKA
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" title=langchain>LANGCHAIN
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" title=loader>LOADER
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" title=mcp>MCP
 <span class=button_tally>1</span>
@@ -3096,8 +3104,6 @@
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E7%89%87/ class="post_tag button button_translucent" title=分片>分片
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" title=可靠性>可靠性
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/ class="post_tag button button_translucent" title=后台任务>后台任务
@@ -3114,9 +3120,13 @@
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" title=安全>安全
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" title=客户端插件>客户端插件
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" title=对象池>对象池
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=工具开发>工具开发
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" title=工具调用>工具调用
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=平滑发布>平滑发布
 <span class=button_tally>1</span>
@@ -3154,44 +3164,36 @@
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" title=机器学习>机器学习
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=检索增强生成>检索增强生成
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E7%BC%96%E6%8E%92/ class="post_tag button button_translucent" title=模型编排>模型编排
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/ class="post_tag button button_translucent" title=模型评估>模型评估
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" title=沟通>沟通
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/ class="post_tag button button_translucent" title=注意力机制>注意力机制
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/ class="post_tag button button_translucent" title=消息队列>消息队列
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B8%B8%E6%88%8F/ class="post_tag button button_translucent" title=游戏>游戏
 <span class=button_tally>1</span></a><br><div class="post_tags_toggle button">所有标签</div><div class=post_tags><div class=tags_list><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" data-position=1 title=a2a>A2A<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=13 title=agent>AGENT<span class=button_tally>13</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=33 title=ai>AI<span class=button_tally>33</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=19 title=agent>AGENT<span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" data-position=1 title="agent loop">AGENT LOOP<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=39 title=ai>AI<span class=button_tally>39</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" data-position=1 title=api网关>API网关<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" data-position=1 title=bm25>BM25<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=2 title=cordis>CORDIS<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=5 title=cordis>CORDIS<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" data-position=2 title=cursor>CURSOR<span class=button_tally>2</span>
-</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=10 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=16 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/deepwiki/ class="post_tag button button_translucent" data-position=4 title=deepwiki>DEEPWIKI<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/definetool/ class="post_tag button button_translucent" data-position=1 title=definetool>DEFINETOOL<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/docker/ class="post_tag button button_translucent" data-position=1 title=docker>DOCKER<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=10 title=dsh>DSH<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=16 title=dsh>DSH<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" data-position=2 title=embedding>EMBEDDING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/fiber/ class="post_tag button button_translucent" data-position=1 title=fiber>FIBER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" data-position=1 title=flink>FLINK<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/function-calling/ class="post_tag button button_translucent" data-position=2 title="function calling">FUNCTION CALLING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" data-position=35 title=golang>GOLANG<span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=1 title=hmr>HMR<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=3 title=hmr>HMR<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" data-position=1 title=hugo>HUGO<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=id生成>ID生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/java/ class="post_tag button button_translucent" data-position=1 title=java>JAVA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" data-position=1 title=kafka>KAFKA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" data-position=1 title=langchain>LANGCHAIN<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" data-position=1 title=loader>LOADER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/lora/ class="post_tag button button_translucent" data-position=2 title=lora>LORA<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" data-position=1 title=mcp>MCP<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/moe/ class="post_tag button button_translucent" data-position=1 title=moe>MOE<span class=button_tally>1</span>
@@ -3206,17 +3208,19 @@
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" data-position=2 title=transformer>TRANSFORMER<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/websocket/ class="post_tag button button_translucent" data-position=1 title=websocket>WEBSOCKET<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" data-position=1 title=安全>安全<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%B5%8B%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=测试>测试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%AD%96%E7%95%A5%E9%92%A9%E5%AD%90/ class="post_tag button button_translucent" data-position=1 title=策略钩子>策略钩子<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=10 title=插件开发>插件开发<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=16 title=插件开发>插件开发<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%89%93%E5%8C%85/ class="post_tag button button_translucent" data-position=1 title=打包>打包<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=26 title=大模型>大模型<span class=button_tally>26</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/ class="post_tag button button_translucent" data-position=1 title=大数据>大数据<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" data-position=1 title=调度系统>调度系统<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%B0%83%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=调试>调试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/ class="post_tag button button_translucent" data-position=1 title=读书笔记>读书笔记<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=对象池>对象池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9Aagent/ class="post_tag button button_translucent" data-position=1 title=多agent>多AGENT<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9A%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=1 title=多模型>多模型<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=1 title=发布>发布<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=2 title=发布>发布<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" data-position=5 title=分布式>分布式<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/ class="post_tag button button_translucent" data-position=1 title=分布式事务>分布式事务<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/ class="post_tag button button_translucent" data-position=1 title=分库分表>分库分表<span class=button_tally>1</span>
@@ -3228,6 +3232,7 @@
 </a><a href=https://namejlt.github.io/tags/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C/ class="post_tag button button_translucent" data-position=1 title=服务注册>服务注册<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/ class="post_tag button button_translucent" data-position=2 title=高并发>高并发<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=高可用>高可用<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=工具调用>工具调用<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=1 title=工具开发>工具开发<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" data-position=1 title=沟通>沟通<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" data-position=1 title=后端>后端<span class=button_tally>1</span>
@@ -3235,10 +3240,11 @@
 </a><a href=https://namejlt.github.io/tags/%E7%BC%93%E5%AD%98/ class="post_tag button button_translucent" data-position=1 title=缓存>缓存<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" data-position=1 title=机器学习>机器学习<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%B0%E5%BF%86/ class="post_tag button button_translucent" data-position=1 title=记忆>记忆<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=1 title=架构>架构<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=4 title=架构>架构<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=检索增强生成>检索增强生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" data-position=2 title=可观测性>可观测性<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" data-position=1 title=可靠性>可靠性<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" data-position=1 title=客户端插件>客户端插件<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%BF%9E%E6%8E%A5%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=连接池>连接池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/ class="post_tag button button_translucent" data-position=1 title=链路追踪>链路追踪<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" data-position=1 title=逻辑>逻辑<span class=button_tally>1</span>
@@ -3252,6 +3258,7 @@
 </a><a href=https://namejlt.github.io/tags/%E5%85%A5%E9%97%A8/ class="post_tag button button_translucent" data-position=1 title=入门>入门<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" data-position=5 title=设计>设计<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/ class="post_tag button button_translucent" data-position=1 title=设计模式>设计模式<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6/ class="post_tag button button_translucent" data-position=1 title=设计哲学>设计哲学<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E6%88%90%E5%BC%8Fai/ class="post_tag button button_translucent" data-position=1 title=生成式ai>生成式AI<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/ class="post_tag button button_translucent" data-position=1 title=生命周期>生命周期<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/ class="post_tag button button_translucent" data-position=1 title=时间序列>时间序列<span class=button_tally>1</span>

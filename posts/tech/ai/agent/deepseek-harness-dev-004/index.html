@@ -3,7 +3,7 @@
 插件化框架的胜负手是卸载是否干净：热替换、服务消失、配置变更都会触发卸载，残留一个定时器、一条监听器，就可能在几小时后的深夜变成离奇 bug。本篇讲透 Harness 的生命周期模型：Fiber 状态机、依赖驱动加载、自动清理、手动 ctx.effect、子 Fiber 与 dispose 语义。读完你能写出「卸 …"><meta property="og:image" content="https://namejlt.github.io/"><meta name=keywords content="AI,Agent,DeepSeek Harness,插件开发,dsh,生命周期,Fiber,HMR"><link rel=apple-touch-icon sizes=180x180 href=https://namejlt.github.io/icons/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://namejlt.github.io/icons/favicon-32x32.png><link rel=manifest href=https://namejlt.github.io/icons/site.webmanifest><link rel=canonical href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/><link rel=preload href=https://namejlt.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" as=style crossorigin=anonymous><link rel=preload href=https://namejlt.github.io/zh/js/bundle.9dc66a376405501ab5af64ef56800cc7cafad61de3519b3542c8f63884ec09ef3e4aba4fded834cfb4c3914c9c36a9119a521257f41dd42ef700ae29b305ddb8.js as=script integrity="sha512-ncZqN2QFUBq1r2TvVoAMx8r61h3jUZs1Qsj2OITsCe8+SrpP3tg0z7TDkUycNqkRmlISV/Qd1C73AK4pswXduA==" crossorigin=anonymous><link rel=stylesheet type=text/css href=https://namejlt.github.io/css/styles.dc38388a8f0b890e788bd3a99b7495d14e7d5ac4359ed3b49abeb778497863b284ad4cc7e496ef58c84139295f9bafed82f5a41345eda86bd2d429cccb7c2596.css integrity="sha512-3Dg4io8LiQ54i9Opm3SV0U59WsQ1ntO0mr63eEl4Y7KErUzH5JbvWMhBOSlfm6/tgvWkE0XtqGvS1CnMy3wllg==" crossorigin=anonymous></head><body data-code=100 data-lines=false id=documentTop data-lang=zh><header class=nav_header><nav class=nav><a href=https://namejlt.github.io/ class="nav_brand nav_item" title="LX 知识库">LX 知识库<div class=nav_close><div><svg class="icon"><title>open-menu</title><use xlink:href="#open-menu"/></svg>
 <svg class="icon"><title>closeme</title><use xlink:href="#closeme"/></svg></div></div></a><div class='nav_body nav_body_left'><div class=nav_parent><a href=https://namejlt.github.io/posts/ class=nav_item title=文章>文章</a></div><div class=nav_parent><a href=https://namejlt.github.io/tags/ class=nav_item title=标签>标签</a></div><div class=nav_parent><a href=https://namejlt.github.io/categories/ class=nav_item title=分类>分类</a></div><div class=nav_parent><a href=https://namejlt.github.io/about/ class=nav_item title=关于>关于</a></div><div class=follow><div class=color_mode><input type=checkbox class=color_choice id=mode></div></div></div></nav></header><main><div class="grid-inverse wrap content"><article class=post_content><h1 class=post_title>AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机</h1><div class=post_meta><span><svg class="icon"><title>calendar</title><use xlink:href="#calendar"/></svg>
 </span><span class=post_date>Oct 19, 2026
-</span><span class=post_time>· 5 分钟阅读</span><span>&nbsp;· <a href=https://namejlt.github.io/tags/ai/ title=AI class="post_tag button button_translucent">AI
+</span><span class=post_time>· 6 分钟阅读</span><span>&nbsp;· <a href=https://namejlt.github.io/tags/ai/ title=AI class="post_tag button button_translucent">AI
 </a><a href=https://namejlt.github.io/tags/agent/ title=Agent class="post_tag button button_translucent">Agent
 </a><a href=https://namejlt.github.io/tags/deepseek-harness/ title="DeepSeek Harness" class="post_tag button button_translucent">DeepSeek Harness
 </a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ title=插件开发 class="post_tag button button_translucent">插件开发
@@ -15,13 +15,13 @@
 <a href="https://twitter.com/intent/tweet?text=AI%20Agent-deepseek-harness%e6%8f%92%e4%bb%b6%e5%bc%80%e5%8f%91004%20%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e3%80%81effect%e4%b8%8eFiber%e7%8a%b6%e6%80%81%e6%9c%ba&url=https%3a%2f%2fnamejlt.github.io%2fposts%2ftech%2fai%2fagent%2fdeepseek-harness-dev-004%2f&tw_p=tweetbutton" class=twitter title="分享到 Twitter" target=_blank rel=nofollow><svg class="icon"><title>twitter</title><use xlink:href="#twitter"/></svg>
 </a><a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fnamejlt.github.io%2fposts%2ftech%2fai%2fagent%2fdeepseek-harness-dev-004%2f&t=AI%20Agent-deepseek-harness%e6%8f%92%e4%bb%b6%e5%bc%80%e5%8f%91004%20%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e3%80%81effect%e4%b8%8eFiber%e7%8a%b6%e6%80%81%e6%9c%ba" class=facebook title="分享到 Facebook" target=_blank rel=nofollow><svg class="icon"><title>facebook</title><use xlink:href="#facebook"/></svg>
 </a><a href=#linkedinshare id=linkedinshare class=linkedin title="分享到 LinkedIn" rel=nofollow><svg class="icon"><title>linkedin</title><use xlink:href="#linkedin"/></svg>
-</a><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ title="Copy Link" class="link link_yank"><svg class="icon"><title>copy</title><use xlink:href="#copy"/></svg></a></div></span></div><div class=post_toc><h2>文章目录</h2><nav id=TableOfContents><ul><li><a href=#概述>概述</a></li><li><a href=#一fiber-状态机>一、Fiber 状态机</a></li><li><a href=#二依赖驱动加载>二、依赖驱动加载</a></li><li><a href=#三自动清理什么被框架追踪>三、自动清理：什么被框架追踪</a><ul><li><a href=#31-反模式警示>3.1 反模式警示</a></li></ul></li><li><a href=#四ctxeffect手动清理的通道>四、ctx.effect：手动清理的通道</a><ul><li><a href=#41-异步清理>4.1 异步清理</a></li></ul></li><li><a href=#五子-fiber-与-dispose-语义>五、子 Fiber 与 dispose 语义</a><ul><li><a href=#51-顺序语义重要>5.1 顺序语义（重要）</a></li></ul></li><li><a href=#六实战带定时任务与缓存的插件骨架>六、实战：带定时任务与缓存的插件骨架</a></li><li><a href=#七排错failed-与泄漏检查>七、排错：FAILED 与泄漏检查</a><ul><li><a href=#71-failed-态排查>7.1 FAILED 态排查</a></li><li><a href=#72-泄漏检查清单>7.2 泄漏检查清单</a></li></ul></li><li><a href=#八练习>八、练习</a></li><li><a href=#小结>小结</a></li></ul></nav></div><div class=post_body><h2 id=概述>概述</h2><p>插件化框架的胜负手是<strong>卸载是否干净</strong>：热替换、服务消失、配置变更都会触发卸载，残留一个定时器、一条监听器，就可能在几小时后的深夜变成离奇 bug。本篇讲透 Harness 的生命周期模型：Fiber 状态机、依赖驱动加载、自动清理、手动 <code>ctx.effect</code>、子 Fiber 与 dispose 语义。读完你能写出「卸载无残留」的插件，并建立自查清单。</p><h2 id=一fiber-状态机>一、Fiber 状态机</h2><p>每个被加载的插件拥有一个 Fiber 作用域：</p><pre tabindex=0><code>PENDING ──▶ LOADING ──▶ ACTIVE
+</a><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ title="Copy Link" class="link link_yank"><svg class="icon"><title>copy</title><use xlink:href="#copy"/></svg></a></div></span></div><div class=post_toc><h2>文章目录</h2><nav id=TableOfContents><ul><li><a href=#概述>概述</a></li><li><a href=#一fiber-状态机>一、Fiber 状态机</a></li><li><a href=#二依赖驱动加载>二、依赖驱动加载</a></li><li><a href=#三自动清理什么被框架追踪>三、自动清理：什么被框架追踪</a><ul><li><a href=#31-反模式警示>3.1 反模式警示</a></li></ul></li><li><a href=#四ctxeffect手动清理的通道>四、ctx.effect：手动清理的通道</a><ul><li><a href=#41-异步清理>4.1 异步清理</a></li></ul></li><li><a href=#五子-fiber-与-dispose-语义>五、子 Fiber 与 dispose 语义</a><ul><li><a href=#51-顺序语义重要>5.1 顺序语义（重要）</a></li></ul></li><li><a href=#六实战带定时任务与缓存的插件骨架>六、实战：带定时任务与缓存的插件骨架</a></li><li><a href=#七排错failed-与泄漏检查>七、排错：FAILED 与泄漏检查</a><ul><li><a href=#71-failed-态排查>7.1 FAILED 态排查</a></li><li><a href=#72-处置器的精确语义>7.2 处置器的精确语义</a></li><li><a href=#73-泄漏检查清单>7.3 泄漏检查清单</a></li></ul></li><li><a href=#八练习>八、练习</a></li><li><a href=#小结>小结</a></li></ul></nav></div><div class=post_body><h2 id=概述>概述</h2><p>插件化框架的胜负手是<strong>卸载是否干净</strong>：热替换、服务消失、配置变更都会触发卸载，残留一个定时器、一条监听器，就可能在几小时后的深夜变成离奇 bug。本篇讲透 Harness 的生命周期模型：Fiber 状态机、依赖驱动加载、自动清理、手动 <code>ctx.effect</code>、子 Fiber 与 dispose 语义。读完你能写出「卸载无残留」的插件，并建立自查清单。</p><h2 id=一fiber-状态机>一、Fiber 状态机</h2><p>每个被加载的插件拥有一个 Fiber 作用域：</p><pre tabindex=0><code>PENDING ──▶ LOADING ──▶ ACTIVE
    │            │
    │            ▼
    │         FAILED          （apply 抛异常）
    ▼
 ACTIVE ──▶ UNLOADING ──▶ DISPOSED
-</code></pre><table><thead><tr><th>状态</th><th>含义</th><th>你要做什么</th></tr></thead><tbody><tr><td>PENDING</td><td>已声明，依赖未就绪</td><td>什么都别做，等着</td></tr><tr><td>LOADING</td><td>依赖就绪，正在执行 <code>apply</code></td><td>同步初始化放这里</td></tr><tr><td>ACTIVE</td><td>运行中</td><td>正常服务</td></tr><tr><td>FAILED</td><td><code>apply</code> 抛异常</td><td>看日志修 bug，框架不会重试崩掉的插件</td></tr><tr><td>UNLOADING</td><td>正在卸载、释放资源</td><td>effect 处置器在这里跑</td></tr><tr><td>DISPOSED</td><td>完全卸载</td><td>终态</td></tr></tbody></table><p>状态转换的两个驱动源：</p><ol><li><strong>依赖</strong>：<code>inject</code> 的服务就绪 → 加载；服务消失 → 卸载，恢复后重载；</li><li><strong>配置</strong>：<code>cordis.yml</code> 改动（HMR）→ 卸载旧实例、加载新实例。</li></ol><h2 id=二依赖驱动加载>二、依赖驱动加载</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-ts data-lang=ts><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>inject</span> <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#39;tools&#39;</span>, <span style=color:#e6db74>&#39;llm&#39;</span>]
+</code></pre><table><thead><tr><th>状态</th><th>含义</th><th>你要做什么</th></tr></thead><tbody><tr><td>PENDING</td><td>已声明，依赖未就绪</td><td>什么都别做，等着</td></tr><tr><td>LOADING</td><td>依赖就绪，正在执行 <code>apply</code></td><td>同步初始化放这里</td></tr><tr><td>ACTIVE</td><td>运行中</td><td>正常服务</td></tr><tr><td>FAILED</td><td><code>apply</code> 抛异常</td><td>看日志修 bug；框架<strong>不会自动重试</strong>，只在依赖 epoch 变化时再试（见 7.1）</td></tr><tr><td>UNLOADING</td><td>正在卸载、释放资源</td><td>effect 处置器在这里跑</td></tr><tr><td>DISPOSED</td><td>完全卸载</td><td>终态</td></tr></tbody></table><blockquote><p>枚举真实取值：<code>PENDING=0, LOADING=1, ACTIVE=2, FAILED=3, DISPOSED=4, UNLOADING=5</code>。编号<strong>没有</strong>语义，别拿它做大小比较或"进度"判断。</p></blockquote><p>状态转换的两个驱动源：</p><ol><li><strong>依赖</strong>：<code>inject</code> 的服务就绪 → 加载；服务消失 → 卸载，恢复后重载；</li><li><strong>配置</strong>：<code>cordis.yml</code> 改动（HMR）→ 卸载旧实例、加载新实例（volatile 字段例外，见第 003 篇）。</li></ol><h2 id=二依赖驱动加载>二、依赖驱动加载</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-ts data-lang=ts><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>inject</span> <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#39;tools&#39;</span>, <span style=color:#e6db74>&#39;llm&#39;</span>]
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span>
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">3</span><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>apply</span>(<span style=color:#a6e22e>ctx</span>: <span style=color:#66d9ef>Context</span>) {
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span>  <span style=color:#75715e>// 框架保证 ctx.tools 与 ctx.llm 在此就绪
@@ -55,7 +55,7 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">4</span><span>}
 </span></span></code></pre></div><p>手动提前终止：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-ts data-lang=ts><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">1</span><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>fiber</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>ctx</span>.<span style=color:#a6e22e>plugin</span>(<span style=color:#a6e22e>myPlugin</span>)
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">2</span><span><span style=color:#66d9ef>await</span> <span style=color:#a6e22e>fiber</span>.<span style=color:#a6e22e>dispose</span>()
-</span></span></code></pre></div><p><code>dispose</code> 保证：</p><ol><li>该插件拥有的所有注册被移除；</li><li>子插件被<strong>递归</strong>卸载；</li><li>返回的 Promise 在所有异步清理完成后兑现。</li></ol><h3 id=51-顺序语义重要>5.1 顺序语义（重要）</h3><p>处置器按<strong>注册顺序的逆序</strong>调用；多个异步处置器<strong>并发执行</strong>，不保证逐个完成。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-ts data-lang=ts><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span><span style=color:#75715e>// ❌ 有顺序依赖的清理拆成两个 effect：并发执行，可能撞车
+</span></span></code></pre></div><p><code>dispose</code> 保证：</p><ol><li>该插件拥有的所有注册被移除；</li><li>子插件被<strong>递归</strong>卸载；</li><li>返回的 Promise 在所有异步清理完成后兑现。</li></ol><h3 id=51-顺序语义重要>5.1 顺序语义（重要）</h3><p><strong>跨 effect</strong> 的处置器<strong>并发执行</strong>（框架对它们做一次 <code>Promise.all</code>），不保证逐个完成；<strong>同一 effect</strong> 里返回的多个处置器则按序 <code>await</code>。精确语义见 7.2。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-ts data-lang=ts><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 1</span><span><span style=color:#75715e>// ❌ 有顺序依赖的清理拆成两个 effect：并发执行，可能撞车
 </span></span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 2</span><span><span style=color:#a6e22e>ctx</span>.<span style=color:#a6e22e>effect</span>(() <span style=color:#f92672>=&gt;</span> { <span style=color:#a6e22e>db</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>open</span>(); <span style=color:#66d9ef>return</span> () <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>db</span>.<span style=color:#a6e22e>close</span>() })
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 3</span><span><span style=color:#a6e22e>ctx</span>.<span style=color:#a6e22e>effect</span>(() <span style=color:#f92672>=&gt;</span> { <span style=color:#a6e22e>db</span>.<span style=color:#a6e22e>query</span>(<span style=color:#e6db74>&#39;...&#39;</span>); <span style=color:#66d9ef>return</span> () <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>db</span>.<span style=color:#a6e22e>rollback</span>() })
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f"> 4</span><span>
@@ -96,14 +96,14 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">27</span><span>  <span style=color:#75715e>// 3) 注册工具：自动注销
 </span></span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">28</span><span>  <span style=color:#a6e22e>ctx</span>.<span style=color:#a6e22e>tools</span>.<span style=color:#a6e22e>register</span>(<span style=color:#a6e22e>defineTool</span>({ <span style=color:#75715e>/* ... */</span> }))
 </span></span><span style=display:flex><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f">29</span><span>}
-</span></span></code></pre></div><p>自查这个骨架：卸载后定时器停了吗？（停了，effect）监听器撤了吗？（撤了，ctx.on）工具没了吗？（没了，register）——全部可逆。</p><h2 id=七排错failed-与泄漏检查>七、排错：FAILED 与泄漏检查</h2><h3 id=71-failed-态排查>7.1 FAILED 态排查</h3><p><code>apply</code> 抛异常 → FAILED，插件不服务。常见原因：</p><table><thead><tr><th>原因</th><th>排查</th></tr></thead><tbody><tr><td>同步初始化抛错</td><td>把可能失败的逻辑移到 effect 或工具 execute 内；<code>apply</code> 里只做轻量同步初始化</td></tr><tr><td>访问了未 inject 的服务</td><td>检查 <code>ctx.xxx</code> 是否有对应 <code>inject</code></td></tr><tr><td>Config 校验失败</td><td>见第 003 篇</td></tr><tr><td>模块加载错误（语法/导入）</td><td>看启动日志堆栈</td></tr></tbody></table><p>设计准则：<strong><code>apply</code> 保持「薄」</strong>——同步、轻量、不抛。重活放 effect / execute。</p><h3 id=72-泄漏检查清单>7.2 泄漏检查清单</h3><ul><li><input disabled type=checkbox> 所有 <code>setInterval</code> / <code>setTimeout</code> 长任务都在 <code>ctx.effect</code> 里；</li><li><input disabled type=checkbox> 所有 <code>process.on</code>（如 <code>SIGINT</code>）都已移除或包在 effect；</li><li><input disabled type=checkbox> 所有子进程在卸载时 kill；</li><li><input disabled type=checkbox> 没有在模块顶层（<code>apply</code> 外）持有可变单例状态——热替换会得到新模块，旧模块的状态成幽灵；</li><li><input disabled type=checkbox> HMR 连续改 5 次文件，观察日志中卸载/加载是否严格配对。</li></ul><h2 id=八练习>八、练习</h2><ol><li>写一个插件：<code>apply</code> 里注册一个每秒打印的定时器（用 effect），HMR 触发三次，确认每秒只有一行日志；</li><li>同一个插件里再 <code>ctx.plugin()</code> 挂一个子插件，<code>dispose()</code> 父 Fiber，验证子插件也被卸载；</li><li>在 <code>apply</code> 里 <code>throw new Error('x')</code>，观察 FAILED 与启动日志；把 throw 移进 <code>ctx.effect</code> 的回调再观察差异。</li></ol><h2 id=小结>小结</h2><ul><li>Fiber 六态：PENDING → LOADING → ACTIVE → UNLOADING → DISPOSED，异常落 FAILED；</li><li><code>inject</code> 依赖驱动：未就绪等待，消失自卸载、恢复自重载；</li><li>ctx 注册全部自动清理：<code>ctx.on</code>、<code>ctx.tools.register</code>、<code>ctx.llm.registerAdapter</code>、<code>ctx.effect</code>；</li><li>有顺序依赖的清理放同一个 effect；异步处置器并发执行；</li><li><code>apply</code> 保持薄；重活外移；用清单防泄漏；</li><li>下一篇深入工具：模型真正能调用的能力长什么样。</li></ul><hr><p><strong>系列导航</strong>：<a href=./deepseek-harness-dev-001.md>001 系列导读</a> · <a href=./deepseek-harness-dev-003.md>上一篇：003 插件配置</a> · <a href=./deepseek-harness-dev-005.md>下一篇：005 工具契约</a></p></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-008/ class=nav-link title="AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分">AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-007/ class=nav-link title="AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite">AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-006/ class=nav-link title="AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite">AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-005/ class=nav-link title="AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约">AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ class=nav-link title="AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机">AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-003/ class=nav-link title="AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制">AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
+</span></span></code></pre></div><p>自查这个骨架：卸载后定时器停了吗？（停了，effect）监听器撤了吗？（撤了，ctx.on）工具没了吗？（没了，register）——全部可逆。</p><h2 id=七排错failed-与泄漏检查>七、排错：FAILED 与泄漏检查</h2><h3 id=71-failed-态排查>7.1 FAILED 态排查</h3><p><code>apply</code> 抛异常 → FAILED，插件不服务。常见原因：</p><table><thead><tr><th>原因</th><th>排查</th></tr></thead><tbody><tr><td>同步初始化抛错</td><td>把可能失败的逻辑移到 effect 或工具 execute 内；<code>apply</code> 里只做轻量同步初始化</td></tr><tr><td>访问了未 inject 的服务</td><td>检查 <code>ctx.xxx</code> 是否有对应 <code>inject</code>（报错原文是 <code>cannot get property "xxx" without inject</code>）</td></tr><tr><td>Config 校验失败</td><td>见第 003 篇（<code>ValidationError</code>，<code>invalid config:</code> 开头）</td></tr><tr><td>模块加载错误（语法/导入）</td><td>看启动日志堆栈；此时根本没进 <code>apply</code></td></tr></tbody></table><p><strong>&ldquo;不会自动重试"要精确到条件</strong>：<code>apply</code> 抛错后 Fiber 停在 FAILED 并把 epoch 置为 INACTIVE；<strong>只有当依赖集合再次变化</strong>——某个服务重新提供、<code>fiber.update()</code> 改配置、HMR 重组——它才会重新走 <code>LOADING</code>。所以"我修好了代码却还在 FAILED"的两种真实原因：</p><ul><li>改的是源码，但 HMR 没监听源码（<code>root: []</code>）；</li><li>改的是配置，但改动没触发该行更新（比如改的是别的行）。</li></ul><p>设计准则：<strong><code>apply</code> 保持「薄」</strong>——同步、轻量、不抛。重活放 effect / execute。</p><h3 id=72-处置器的精确语义>7.2 处置器的精确语义</h3><p>两句容易记混的话，这里说清楚：</p><ul><li><strong>不同 effect 之间：并发</strong>。卸载时框架对所有 effect 的处置器做一次 <code>Promise.all</code>，不保证先后；</li><li><strong>同一个 effect 返回多个处置器时：串行</strong>，按返回顺序依次 <code>await</code>。</li></ul><p>因此"有顺序依赖的清理"要么放进<strong>同一个</strong>处置器的函数体里（<code>await a(); await b()</code>），要么放进同一个 effect 返回的处置器数组。拆到两个 effect 里就是并发，撞车概率随负载上升。</p><h3 id=73-泄漏检查清单>7.3 泄漏检查清单</h3><ul><li><input disabled type=checkbox> 所有 <code>setInterval</code> / <code>setTimeout</code> 长任务都在 <code>ctx.effect</code> 里；</li><li><input disabled type=checkbox> 所有 <code>process.on</code>（如 <code>SIGINT</code>）都已移除或包在 effect；</li><li><input disabled type=checkbox> 所有子进程在卸载时 kill；</li><li><input disabled type=checkbox> 没有在模块顶层（<code>apply</code> 外）持有可变单例状态——热替换会得到新模块，旧模块的状态成幽灵；</li><li><input disabled type=checkbox> HMR 连续改 5 次文件，观察日志中卸载/加载是否严格配对。</li></ul><h2 id=八练习>八、练习</h2><ol><li>写一个插件：<code>apply</code> 里注册一个每秒打印的定时器（用 effect），HMR 触发三次，确认每秒只有一行日志；</li><li>同一个插件里再 <code>ctx.plugin()</code> 挂一个子插件，<code>dispose()</code> 父 Fiber，验证子插件也被卸载；</li><li>在 <code>apply</code> 里 <code>throw new Error('x')</code>，观察 FAILED 与启动日志；把 throw 移进 <code>ctx.effect</code> 的回调再观察差异。</li></ol><h2 id=小结>小结</h2><ul><li>Fiber 六态：PENDING → LOADING → ACTIVE → UNLOADING → DISPOSED，异常落 FAILED（编号无语义）；</li><li><code>inject</code> 依赖驱动：未就绪等待（静默），消失自卸载、恢复自重载；</li><li>FAILED <strong>不自动重试</strong>，只在依赖 epoch 变化（服务重提供 / <code>update()</code> / HMR）时再试；</li><li>ctx 注册全部自动清理：<code>ctx.on</code>、<code>ctx.tools.register</code>、<code>ctx.llm.registerAdapter</code>、<code>ctx.effect</code>；</li><li>处置器：跨 effect 并发（<code>Promise.all</code>）、同 effect 内按序 <code>await</code>——有顺序依赖的清理放同一个处置器里；</li><li><code>apply</code> 保持薄；重活外移；用清单防泄漏；</li><li>下一篇深入工具：模型真正能调用的能力长什么样。</li></ul><hr><p><strong>系列导航</strong>：<a href=/posts/tech/ai/agent/deepseek-harness-dev-001/>001 系列导读</a> · <a href=/posts/tech/ai/agent/deepseek-harness-dev-003/>上一篇：003 插件配置</a> · <a href=/posts/tech/ai/agent/deepseek-harness-dev-005/>下一篇：005 工具契约</a> · <a href=/posts/tech/ai/agent/deepseek-harness-dev-012/>原理篇参考：012 设计哲学</a></p></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-016/ class=nav-link title="AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册">AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-015/ class=nav-link title="AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包">AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-014/ class=nav-link title="AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新">AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-013/ class=nav-link title="AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路">AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-012/ class=nav-link title="AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象">AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-011/ class=nav-link title="AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图">AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
 <span class=button_tally>35</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=技术/ai/应用开发>技术/AI/应用开发
 <span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" title=技术/实践/后端>技术/实践/后端
 <span class=button_tally>14</span>
-</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
-<span class=button_tally>10</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" title=技术/实践/设计>技术/实践/设计
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/deepwiki/ class="post_tag button button_translucent" title=技术/源码阅读/deepwiki>技术/源码阅读/DEEPWIKI
@@ -125,22 +125,24 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/hugo/ class="post_tag button button_translucent" title=技术/源码阅读/hugo>技术/源码阅读/HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/categories/%E7%94%9F%E6%B4%BB/%E6%8A%80%E8%83%BD/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" title=生活/技能/逻辑>生活/技能/逻辑
-<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
+<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
+<span class=button_tally>39</span>
+</a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
 <span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
-<span class=button_tally>33</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" title=大模型>大模型
 <span class=button_tally>26</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
+<span class=button_tally>19</span>
 </a><a href=https://namejlt.github.io/tags/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=应用开发>应用开发
 <span class=button_tally>19</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
-<span class=button_tally>13</span>
 </a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" title="deepseek harness">DEEPSEEK HARNESS
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" title=dsh>DSH
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=插件开发>插件开发
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
+<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" title=分布式>分布式
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/ class="post_tag button button_translucent" title=源码阅读>源码阅读
@@ -155,12 +157,14 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/ class="post_tag button button_translucent" title=数据库>数据库
 <span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
+<span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
+<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/redis/ class="post_tag button button_translucent" title=redis>REDIS
 <span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ class="post_tag button button_translucent" title=研发效能>研发效能
 <span class=button_tally>3</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
-<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" title=cursor>CURSOR
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" title=embedding>EMBEDDING
@@ -174,6 +178,8 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" title=transformer>TRANSFORMER
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" title=事件系统>事件系统
+<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" title=可观测性>可观测性
 <span class=button_tally>2</span>
@@ -193,6 +199,8 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" title=a2a>A2A
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" title="agent loop">AGENT LOOP
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" title=api网关>API网关
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" title=bm25>BM25
@@ -205,8 +213,6 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" title=flink>FLINK
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" title=hugo>HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=id生成>ID生成
@@ -216,6 +222,8 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" title=kafka>KAFKA
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" title=langchain>LANGCHAIN
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" title=loader>LOADER
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" title=mcp>MCP
 <span class=button_tally>1</span>
@@ -251,8 +259,6 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E7%89%87/ class="post_tag button button_translucent" title=分片>分片
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" title=可靠性>可靠性
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/ class="post_tag button button_translucent" title=后台任务>后台任务
@@ -269,9 +275,13 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" title=安全>安全
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" title=客户端插件>客户端插件
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" title=对象池>对象池
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=工具开发>工具开发
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" title=工具调用>工具调用
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=平滑发布>平滑发布
 <span class=button_tally>1</span>
@@ -309,44 +319,36 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" title=机器学习>机器学习
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=检索增强生成>检索增强生成
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E7%BC%96%E6%8E%92/ class="post_tag button button_translucent" title=模型编排>模型编排
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/ class="post_tag button button_translucent" title=模型评估>模型评估
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" title=沟通>沟通
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/ class="post_tag button button_translucent" title=注意力机制>注意力机制
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/ class="post_tag button button_translucent" title=消息队列>消息队列
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B8%B8%E6%88%8F/ class="post_tag button button_translucent" title=游戏>游戏
 <span class=button_tally>1</span></a><br><div class="post_tags_toggle button">所有标签</div><div class=post_tags><div class=tags_list><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" data-position=1 title=a2a>A2A<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=13 title=agent>AGENT<span class=button_tally>13</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=33 title=ai>AI<span class=button_tally>33</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=19 title=agent>AGENT<span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" data-position=1 title="agent loop">AGENT LOOP<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=39 title=ai>AI<span class=button_tally>39</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" data-position=1 title=api网关>API网关<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" data-position=1 title=bm25>BM25<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=2 title=cordis>CORDIS<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=5 title=cordis>CORDIS<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" data-position=2 title=cursor>CURSOR<span class=button_tally>2</span>
-</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=10 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=16 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/deepwiki/ class="post_tag button button_translucent" data-position=4 title=deepwiki>DEEPWIKI<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/definetool/ class="post_tag button button_translucent" data-position=1 title=definetool>DEFINETOOL<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/docker/ class="post_tag button button_translucent" data-position=1 title=docker>DOCKER<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=10 title=dsh>DSH<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=16 title=dsh>DSH<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" data-position=2 title=embedding>EMBEDDING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/fiber/ class="post_tag button button_translucent" data-position=1 title=fiber>FIBER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" data-position=1 title=flink>FLINK<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/function-calling/ class="post_tag button button_translucent" data-position=2 title="function calling">FUNCTION CALLING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" data-position=35 title=golang>GOLANG<span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=1 title=hmr>HMR<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=3 title=hmr>HMR<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" data-position=1 title=hugo>HUGO<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=id生成>ID生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/java/ class="post_tag button button_translucent" data-position=1 title=java>JAVA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" data-position=1 title=kafka>KAFKA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" data-position=1 title=langchain>LANGCHAIN<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" data-position=1 title=loader>LOADER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/lora/ class="post_tag button button_translucent" data-position=2 title=lora>LORA<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" data-position=1 title=mcp>MCP<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/moe/ class="post_tag button button_translucent" data-position=1 title=moe>MOE<span class=button_tally>1</span>
@@ -361,17 +363,19 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" data-position=2 title=transformer>TRANSFORMER<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/websocket/ class="post_tag button button_translucent" data-position=1 title=websocket>WEBSOCKET<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" data-position=1 title=安全>安全<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%B5%8B%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=测试>测试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%AD%96%E7%95%A5%E9%92%A9%E5%AD%90/ class="post_tag button button_translucent" data-position=1 title=策略钩子>策略钩子<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=10 title=插件开发>插件开发<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=16 title=插件开发>插件开发<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%89%93%E5%8C%85/ class="post_tag button button_translucent" data-position=1 title=打包>打包<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=26 title=大模型>大模型<span class=button_tally>26</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/ class="post_tag button button_translucent" data-position=1 title=大数据>大数据<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" data-position=1 title=调度系统>调度系统<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%B0%83%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=调试>调试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/ class="post_tag button button_translucent" data-position=1 title=读书笔记>读书笔记<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=对象池>对象池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9Aagent/ class="post_tag button button_translucent" data-position=1 title=多agent>多AGENT<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9A%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=1 title=多模型>多模型<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=1 title=发布>发布<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=2 title=发布>发布<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" data-position=5 title=分布式>分布式<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/ class="post_tag button button_translucent" data-position=1 title=分布式事务>分布式事务<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/ class="post_tag button button_translucent" data-position=1 title=分库分表>分库分表<span class=button_tally>1</span>
@@ -383,6 +387,7 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C/ class="post_tag button button_translucent" data-position=1 title=服务注册>服务注册<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/ class="post_tag button button_translucent" data-position=2 title=高并发>高并发<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=高可用>高可用<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=工具调用>工具调用<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=1 title=工具开发>工具开发<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" data-position=1 title=沟通>沟通<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" data-position=1 title=后端>后端<span class=button_tally>1</span>
@@ -390,10 +395,11 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/%E7%BC%93%E5%AD%98/ class="post_tag button button_translucent" data-position=1 title=缓存>缓存<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" data-position=1 title=机器学习>机器学习<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%B0%E5%BF%86/ class="post_tag button button_translucent" data-position=1 title=记忆>记忆<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=1 title=架构>架构<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=4 title=架构>架构<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=检索增强生成>检索增强生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" data-position=2 title=可观测性>可观测性<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" data-position=1 title=可靠性>可靠性<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" data-position=1 title=客户端插件>客户端插件<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%BF%9E%E6%8E%A5%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=连接池>连接池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/ class="post_tag button button_translucent" data-position=1 title=链路追踪>链路追踪<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" data-position=1 title=逻辑>逻辑<span class=button_tally>1</span>
@@ -407,6 +413,7 @@ ACTIVE ──▶ UNLOADING ──▶ DISPOSED
 </a><a href=https://namejlt.github.io/tags/%E5%85%A5%E9%97%A8/ class="post_tag button button_translucent" data-position=1 title=入门>入门<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" data-position=5 title=设计>设计<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/ class="post_tag button button_translucent" data-position=1 title=设计模式>设计模式<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6/ class="post_tag button button_translucent" data-position=1 title=设计哲学>设计哲学<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E6%88%90%E5%BC%8Fai/ class="post_tag button button_translucent" data-position=1 title=生成式ai>生成式AI<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/ class="post_tag button button_translucent" data-position=1 title=生命周期>生命周期<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/ class="post_tag button button_translucent" data-position=1 title=时间序列>时间序列<span class=button_tally>1</span>

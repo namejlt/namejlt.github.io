@@ -290,14 +290,14 @@ ii. 将该任务重新投递到<strong>一个专门的延迟队列</strong>中�
 iii. 增加消息的“已重试次数”计数器。
 d. <strong>如果遇到不可重试错误</strong>: 直接将结果（失败）通知给支付服务，更新订单为<code>FAILED</code>。
 e. <strong>如果达到最大重试次数</strong>: 同样通知支付服务，更新订单为<code>FAILED</code>。
-f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li></ul></li></ol><hr><h2 id=2-psp回调成功但支付系统订单已failed的处理>2. PSP回调成功，但支付系统订单已Failed的处理</h2><p>这是一个经典的分布式系统状态冲突问题，通常由系统超时引起。</p><h3 id=21-问题场景>2.1. 问题场景</h3><ol><li><code>T0</code>: 支付服务发起支付，将订单状态置为<code>PROCESSING</code>，并开始等待PSP的回调。</li><li><code>T0 + 15min</code>: 支付服务设置的内部超时定时器触发（例如15分钟内未收到任何回调）。为避免商户资金长时间不确定，系统将该订单状态更新为<code>FAILED</code>。</li><li><code>T0 + 16min</code>: PSP的成功回调通知 (<code>SUCCESS</code>) 到达系统。此时，内部订单状态已经是<code>FAILED</code>。</li></ol><h3 id=22-处理原则>2.2. 处理原则</h3><ul><li><strong>事实优先</strong>: PSP的账单是资金转移的最终事实。如果PSP确认收款成功，那么钱确实已经被划走了。</li><li><strong>状态机单向性</strong>: 严格遵守<code>FAILED</code>是终态的原则，<strong>绝不能</strong>直接将<code>FAILED</code>状态扭转为<code>SUCCEEDED</code>。这会破坏状态机的可信度，并可能导致下游业务逻辑混乱（例如，库存已经释放，现在又要重新扣减）。</li><li><strong>异常记录与告警</strong>: 这是一个必须被记录和跟进的异常情况。</li></ul><h3 id=23-具体处理方式>2.3. 具体处理方式</h3><ol><li><p><strong>识别冲突</strong>: 当回调处理器接收到PSP的成功通知时，它会加载内部订单。此时发现 <code>internal_order.status == 'FAILED'</code>，冲突被识别。</p></li><li><p><strong>创建冲正交易 (Reversal Transaction)</strong>:</p><ul><li>系统不修改原<code>FAILED</code>订单。</li><li>在<code>reconciliation_items</code>（对账明细表）或一个专门的<code>payment_anomalies</code>（支付异常表）中，创建一条记录，标记为<code>LATE_SUCCESS_ON_FAILED_ORDER</code>。记录下内部订单ID、PSP交易ID、金额等所有相关信息。</li></ul></li><li><p><strong>人工干预队列与告警</strong>:</p><ul><li>将这条异常记录推送到一个需要人工审核的“异常处理队列”中。</li><li>立即通过监控系统（如PagerDuty, Slack）向财务运营团队和技术团队发送<strong>高优告警</strong>。</li></ul></li><li><p><strong>人工或半自动化处理</strong>:</p><ul><li><strong>业务决策</strong>: 运营团队需要根据业务场景决定如何处理这笔“意外之财”。<ul><li><strong>场景A：商品/服务未提供</strong>: 如果因为订单<code>FAILED</code>而没有给用户提供服务，最佳选择是<strong>发起退款</strong>。运营人员通过后台系统，针对这笔PSP交易发起一次全额退款操作。</li><li><strong>场景B：服务已提供或无法撤销</strong>: 如果业务逻辑复杂，或者需要为商户入账，运营人员需要执行<strong>手动入账</strong>流程。</li></ul></li><li><strong>账务修正</strong>: 无论是退款还是手动入账，都需要在<strong>账务核心 (Ledger Service)</strong> 中创建一笔新的、独立的账务交易来使账目平衡。<ul><li><strong>手动入账分录</strong>:<ul><li>借：PSP应收账款</li><li>贷：商户待结算账户</li><li>贷：平台手续费收入</li></ul></li><li>这笔分录的描述应明确指向原始的<code>FAILED</code>订单和本次异常事件，便于审计。</li></ul></li></ul></li></ol><hr><h2 id=3-对账异常的具体处理方式>3. 对账异常的具体处理方式</h2><p>对账的核心是将我们的记录与PSP的记录进行<code>JOIN</code>操作。异常就是<code>JOIN</code>失败或<code>JOIN</code>后字段不匹配的情况。</p><h3 id=31-case-1-psp有系统无-长款---we-owe-money>3.1. Case 1: PSP有，系统无 (长款 - We Owe Money)</h3><ul><li><strong>描述</strong>: PSP的对账单里有一笔成功的交易，但在我们的<code>payment_orders</code>表中找不到对应的记录。</li><li><strong>可能原因</strong>:<ul><li>用户在支付流程中，请求到达了PSP，但在写入我们自己数据库前，我们的系统崩溃了。</li><li>有人绕过系统，直接在PSP的后台（Dashboard）创建了一笔收款。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>记录差异</strong>: 在<code>reconciliation_items</code>表中创建一条记录，<code>status</code>为<code>MISSING_IN_SYSTEM</code>。</li><li><strong>高优告警</strong>: 通知财务和技术团队。</li><li><strong>人工调查</strong>:<ul><li>财务人员需要根据PSP账单中的信息（如购买者邮箱、备注）来确定这笔资金的归属。</li><li>联系对应的商户，确认是否有这笔交易。</li></ul></li><li><strong>资金处理</strong>:<ul><li><strong>若能找到归属</strong>: 通过后台工具<strong>补单</strong>，即手动创建<code>payment_order</code>记录和相应的账务分录，然后将这笔对账差异标记为“已解决”。</li><li><strong>若无法找到归属</strong>: 这笔资金成为平台的“无人认领资金”。在账务上，记入一个临时的“暂收应付款”科目。在一定期限后（如6个月），如果仍无人认领，根据公司财务制度，可能计入营业外收入，或持续挂账。</li></ul></li></ol></li></ul><h3 id=32-case-2-系统有psp无-短款---we-are-owed-money>3.2. Case 2: 系统有，PSP无 (短款 - We are Owed Money)</h3><ul><li><strong>描述</strong>: 我们的系统里有一笔<code>SUCCEEDED</code>的订单，但在PSP的对账单（包括交易单和结算单）里都找不到。</li><li><strong>可能原因</strong>:<ul><li>我们错误地处理了PSP的回调，将一个失败的请求记为了成功。</li><li>PSP的结算周期问题，这笔交易可能在下一期的账单中。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>设置宽限期</strong>: 不要立即判断为异常。将这条记录标记为<code>PENDING_MATCH</code>，等待1-2个对账周期。</li><li><strong>主动查询</strong>: 如果在宽限期后仍然不存在，使用订单的<code>psp_transaction_id</code>调用PSP的<code>GetPaymentStatus</code> API进行主动查询。</li><li><strong>确认差异</strong>: 如果API确认该交易<strong>不存在</strong>或<strong>失败</strong>，那么这就是一个严重的内部状态错误。<ul><li>在<code>reconciliation_items</code>中标记为<code>MISSING_IN_PSP</code>。</li><li><strong>严重告警</strong>: 通知开发团队和财务团队，这通常意味着系统存在Bug。</li></ul></li><li><strong>账务冲正</strong>:<ul><li>运营或财务人员需要执行一个<strong>内部冲正</strong>操作。</li><li>在账务核心中，做一笔与原始入账分录完全相反的会计分录，以轧平账目。</li><li><strong>状态修正</strong>: 对<code>payment_orders</code>表中的这条错误记录，不能直接修改状态。应增加一个<code>adjustment_status</code>字段或在关联的修正表里标记其已被冲正，并附上原因。这保证了原始记录的不可篡改性，符合审计要求。</li></ul></li></ol></li></ul><h3 id=33-case-3-金额货币不匹配>3.3. Case 3: 金额/货币不匹配</h3><ul><li><strong>描述</strong>: 系统和PSP都有记录，但金额或货币不一致。</li><li><strong>可能原因</strong>:<ul><li><strong>手续费</strong>: 我们记录的是订单金额，PSP账单记录的是扣除手续费后的净额。</li><li><strong>退款</strong>: 发生了部分退款。</li><li><strong>货币换算</strong>: 涉及跨境支付时，汇率差或换汇手续费导致金额不一致。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>记录差异</strong>: 在<code>reconciliation_items</code>中标记为<code>AMOUNT_MISMATCH</code>，并记录下双方的金额和差额。</li><li><strong>自动化规则匹配</strong>:<ul><li>系统可以预置PSP的费率规则。如果差额正好等于<code>订单金额 * 费率 + 固定费用</code>，系统可以自动将该差异归因于“手续费”，并标记为“已解决”。</li><li>同样，如果差额与系统中的退款记录匹配，也可以自动核销。</li></ul></li><li><strong>人工审核</strong>: 对于无法被规则自动解释的差额，推送到人工审核队列。</li><li><strong>账务调整</strong>: 财务人员审核后，手动将差额计入正确的会计科目，如“银行手续费”、“汇兑损益”等。</li></ol></li></ul></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-008/ class=nav-link title="AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分">AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-007/ class=nav-link title="AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite">AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-006/ class=nav-link title="AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite">AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-005/ class=nav-link title="AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约">AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ class=nav-link title="AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机">AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-003/ class=nav-link title="AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制">AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
+f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li></ul></li></ol><hr><h2 id=2-psp回调成功但支付系统订单已failed的处理>2. PSP回调成功，但支付系统订单已Failed的处理</h2><p>这是一个经典的分布式系统状态冲突问题，通常由系统超时引起。</p><h3 id=21-问题场景>2.1. 问题场景</h3><ol><li><code>T0</code>: 支付服务发起支付，将订单状态置为<code>PROCESSING</code>，并开始等待PSP的回调。</li><li><code>T0 + 15min</code>: 支付服务设置的内部超时定时器触发（例如15分钟内未收到任何回调）。为避免商户资金长时间不确定，系统将该订单状态更新为<code>FAILED</code>。</li><li><code>T0 + 16min</code>: PSP的成功回调通知 (<code>SUCCESS</code>) 到达系统。此时，内部订单状态已经是<code>FAILED</code>。</li></ol><h3 id=22-处理原则>2.2. 处理原则</h3><ul><li><strong>事实优先</strong>: PSP的账单是资金转移的最终事实。如果PSP确认收款成功，那么钱确实已经被划走了。</li><li><strong>状态机单向性</strong>: 严格遵守<code>FAILED</code>是终态的原则，<strong>绝不能</strong>直接将<code>FAILED</code>状态扭转为<code>SUCCEEDED</code>。这会破坏状态机的可信度，并可能导致下游业务逻辑混乱（例如，库存已经释放，现在又要重新扣减）。</li><li><strong>异常记录与告警</strong>: 这是一个必须被记录和跟进的异常情况。</li></ul><h3 id=23-具体处理方式>2.3. 具体处理方式</h3><ol><li><p><strong>识别冲突</strong>: 当回调处理器接收到PSP的成功通知时，它会加载内部订单。此时发现 <code>internal_order.status == 'FAILED'</code>，冲突被识别。</p></li><li><p><strong>创建冲正交易 (Reversal Transaction)</strong>:</p><ul><li>系统不修改原<code>FAILED</code>订单。</li><li>在<code>reconciliation_items</code>（对账明细表）或一个专门的<code>payment_anomalies</code>（支付异常表）中，创建一条记录，标记为<code>LATE_SUCCESS_ON_FAILED_ORDER</code>。记录下内部订单ID、PSP交易ID、金额等所有相关信息。</li></ul></li><li><p><strong>人工干预队列与告警</strong>:</p><ul><li>将这条异常记录推送到一个需要人工审核的“异常处理队列”中。</li><li>立即通过监控系统（如PagerDuty, Slack）向财务运营团队和技术团队发送<strong>高优告警</strong>。</li></ul></li><li><p><strong>人工或半自动化处理</strong>:</p><ul><li><strong>业务决策</strong>: 运营团队需要根据业务场景决定如何处理这笔“意外之财”。<ul><li><strong>场景A：商品/服务未提供</strong>: 如果因为订单<code>FAILED</code>而没有给用户提供服务，最佳选择是<strong>发起退款</strong>。运营人员通过后台系统，针对这笔PSP交易发起一次全额退款操作。</li><li><strong>场景B：服务已提供或无法撤销</strong>: 如果业务逻辑复杂，或者需要为商户入账，运营人员需要执行<strong>手动入账</strong>流程。</li></ul></li><li><strong>账务修正</strong>: 无论是退款还是手动入账，都需要在<strong>账务核心 (Ledger Service)</strong> 中创建一笔新的、独立的账务交易来使账目平衡。<ul><li><strong>手动入账分录</strong>:<ul><li>借：PSP应收账款</li><li>贷：商户待结算账户</li><li>贷：平台手续费收入</li></ul></li><li>这笔分录的描述应明确指向原始的<code>FAILED</code>订单和本次异常事件，便于审计。</li></ul></li></ul></li></ol><hr><h2 id=3-对账异常的具体处理方式>3. 对账异常的具体处理方式</h2><p>对账的核心是将我们的记录与PSP的记录进行<code>JOIN</code>操作。异常就是<code>JOIN</code>失败或<code>JOIN</code>后字段不匹配的情况。</p><h3 id=31-case-1-psp有系统无-长款---we-owe-money>3.1. Case 1: PSP有，系统无 (长款 - We Owe Money)</h3><ul><li><strong>描述</strong>: PSP的对账单里有一笔成功的交易，但在我们的<code>payment_orders</code>表中找不到对应的记录。</li><li><strong>可能原因</strong>:<ul><li>用户在支付流程中，请求到达了PSP，但在写入我们自己数据库前，我们的系统崩溃了。</li><li>有人绕过系统，直接在PSP的后台（Dashboard）创建了一笔收款。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>记录差异</strong>: 在<code>reconciliation_items</code>表中创建一条记录，<code>status</code>为<code>MISSING_IN_SYSTEM</code>。</li><li><strong>高优告警</strong>: 通知财务和技术团队。</li><li><strong>人工调查</strong>:<ul><li>财务人员需要根据PSP账单中的信息（如购买者邮箱、备注）来确定这笔资金的归属。</li><li>联系对应的商户，确认是否有这笔交易。</li></ul></li><li><strong>资金处理</strong>:<ul><li><strong>若能找到归属</strong>: 通过后台工具<strong>补单</strong>，即手动创建<code>payment_order</code>记录和相应的账务分录，然后将这笔对账差异标记为“已解决”。</li><li><strong>若无法找到归属</strong>: 这笔资金成为平台的“无人认领资金”。在账务上，记入一个临时的“暂收应付款”科目。在一定期限后（如6个月），如果仍无人认领，根据公司财务制度，可能计入营业外收入，或持续挂账。</li></ul></li></ol></li></ul><h3 id=32-case-2-系统有psp无-短款---we-are-owed-money>3.2. Case 2: 系统有，PSP无 (短款 - We are Owed Money)</h3><ul><li><strong>描述</strong>: 我们的系统里有一笔<code>SUCCEEDED</code>的订单，但在PSP的对账单（包括交易单和结算单）里都找不到。</li><li><strong>可能原因</strong>:<ul><li>我们错误地处理了PSP的回调，将一个失败的请求记为了成功。</li><li>PSP的结算周期问题，这笔交易可能在下一期的账单中。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>设置宽限期</strong>: 不要立即判断为异常。将这条记录标记为<code>PENDING_MATCH</code>，等待1-2个对账周期。</li><li><strong>主动查询</strong>: 如果在宽限期后仍然不存在，使用订单的<code>psp_transaction_id</code>调用PSP的<code>GetPaymentStatus</code> API进行主动查询。</li><li><strong>确认差异</strong>: 如果API确认该交易<strong>不存在</strong>或<strong>失败</strong>，那么这就是一个严重的内部状态错误。<ul><li>在<code>reconciliation_items</code>中标记为<code>MISSING_IN_PSP</code>。</li><li><strong>严重告警</strong>: 通知开发团队和财务团队，这通常意味着系统存在Bug。</li></ul></li><li><strong>账务冲正</strong>:<ul><li>运营或财务人员需要执行一个<strong>内部冲正</strong>操作。</li><li>在账务核心中，做一笔与原始入账分录完全相反的会计分录，以轧平账目。</li><li><strong>状态修正</strong>: 对<code>payment_orders</code>表中的这条错误记录，不能直接修改状态。应增加一个<code>adjustment_status</code>字段或在关联的修正表里标记其已被冲正，并附上原因。这保证了原始记录的不可篡改性，符合审计要求。</li></ul></li></ol></li></ul><h3 id=33-case-3-金额货币不匹配>3.3. Case 3: 金额/货币不匹配</h3><ul><li><strong>描述</strong>: 系统和PSP都有记录，但金额或货币不一致。</li><li><strong>可能原因</strong>:<ul><li><strong>手续费</strong>: 我们记录的是订单金额，PSP账单记录的是扣除手续费后的净额。</li><li><strong>退款</strong>: 发生了部分退款。</li><li><strong>货币换算</strong>: 涉及跨境支付时，汇率差或换汇手续费导致金额不一致。</li></ul></li><li><strong>处理流程</strong>:<ol><li><strong>记录差异</strong>: 在<code>reconciliation_items</code>中标记为<code>AMOUNT_MISMATCH</code>，并记录下双方的金额和差额。</li><li><strong>自动化规则匹配</strong>:<ul><li>系统可以预置PSP的费率规则。如果差额正好等于<code>订单金额 * 费率 + 固定费用</code>，系统可以自动将该差异归因于“手续费”，并标记为“已解决”。</li><li>同样，如果差额与系统中的退款记录匹配，也可以自动核销。</li></ul></li><li><strong>人工审核</strong>: 对于无法被规则自动解释的差额，推送到人工审核队列。</li><li><strong>账务调整</strong>: 财务人员审核后，手动将差额计入正确的会计科目，如“银行手续费”、“汇兑损益”等。</li></ol></li></ul></div><div class=post_comments></div></article><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-016/ class=nav-link title="AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册">AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-015/ class=nav-link title="AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包">AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-014/ class=nav-link title="AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新">AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-013/ class=nav-link title="AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路">AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-012/ class=nav-link title="AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象">AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-011/ class=nav-link title="AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图">AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
 <span class=button_tally>35</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=技术/ai/应用开发>技术/AI/应用开发
 <span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" title=技术/实践/后端>技术/实践/后端
 <span class=button_tally>14</span>
-</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
-<span class=button_tally>10</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" title=技术/实践/设计>技术/实践/设计
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/deepwiki/ class="post_tag button button_translucent" title=技术/源码阅读/deepwiki>技术/源码阅读/DEEPWIKI
@@ -319,22 +319,24 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/hugo/ class="post_tag button button_translucent" title=技术/源码阅读/hugo>技术/源码阅读/HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/categories/%E7%94%9F%E6%B4%BB/%E6%8A%80%E8%83%BD/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" title=生活/技能/逻辑>生活/技能/逻辑
-<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
+<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
+<span class=button_tally>39</span>
+</a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
 <span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
-<span class=button_tally>33</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" title=大模型>大模型
 <span class=button_tally>26</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
+<span class=button_tally>19</span>
 </a><a href=https://namejlt.github.io/tags/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=应用开发>应用开发
 <span class=button_tally>19</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
-<span class=button_tally>13</span>
 </a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" title="deepseek harness">DEEPSEEK HARNESS
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" title=dsh>DSH
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=插件开发>插件开发
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
+<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" title=分布式>分布式
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/ class="post_tag button button_translucent" title=源码阅读>源码阅读
@@ -349,12 +351,14 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/ class="post_tag button button_translucent" title=数据库>数据库
 <span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
+<span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
+<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/redis/ class="post_tag button button_translucent" title=redis>REDIS
 <span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ class="post_tag button button_translucent" title=研发效能>研发效能
 <span class=button_tally>3</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
-<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" title=cursor>CURSOR
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" title=embedding>EMBEDDING
@@ -368,6 +372,8 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" title=transformer>TRANSFORMER
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" title=事件系统>事件系统
+<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" title=可观测性>可观测性
 <span class=button_tally>2</span>
@@ -387,6 +393,8 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" title=a2a>A2A
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" title="agent loop">AGENT LOOP
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" title=api网关>API网关
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" title=bm25>BM25
@@ -399,8 +407,6 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" title=flink>FLINK
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" title=hugo>HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=id生成>ID生成
@@ -410,6 +416,8 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" title=kafka>KAFKA
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" title=langchain>LANGCHAIN
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" title=loader>LOADER
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" title=mcp>MCP
 <span class=button_tally>1</span>
@@ -445,8 +453,6 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E7%89%87/ class="post_tag button button_translucent" title=分片>分片
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" title=可靠性>可靠性
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/ class="post_tag button button_translucent" title=后台任务>后台任务
@@ -463,9 +469,13 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" title=安全>安全
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" title=客户端插件>客户端插件
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" title=对象池>对象池
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=工具开发>工具开发
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" title=工具调用>工具调用
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=平滑发布>平滑发布
 <span class=button_tally>1</span>
@@ -503,44 +513,36 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" title=机器学习>机器学习
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=检索增强生成>检索增强生成
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E7%BC%96%E6%8E%92/ class="post_tag button button_translucent" title=模型编排>模型编排
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/ class="post_tag button button_translucent" title=模型评估>模型评估
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" title=沟通>沟通
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/ class="post_tag button button_translucent" title=注意力机制>注意力机制
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/ class="post_tag button button_translucent" title=消息队列>消息队列
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B8%B8%E6%88%8F/ class="post_tag button button_translucent" title=游戏>游戏
 <span class=button_tally>1</span></a><br><div class="post_tags_toggle button">所有标签</div><div class=post_tags><div class=tags_list><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" data-position=1 title=a2a>A2A<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=13 title=agent>AGENT<span class=button_tally>13</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=33 title=ai>AI<span class=button_tally>33</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=19 title=agent>AGENT<span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" data-position=1 title="agent loop">AGENT LOOP<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=39 title=ai>AI<span class=button_tally>39</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" data-position=1 title=api网关>API网关<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" data-position=1 title=bm25>BM25<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=2 title=cordis>CORDIS<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=5 title=cordis>CORDIS<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" data-position=2 title=cursor>CURSOR<span class=button_tally>2</span>
-</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=10 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=16 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/deepwiki/ class="post_tag button button_translucent" data-position=4 title=deepwiki>DEEPWIKI<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/definetool/ class="post_tag button button_translucent" data-position=1 title=definetool>DEFINETOOL<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/docker/ class="post_tag button button_translucent" data-position=1 title=docker>DOCKER<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=10 title=dsh>DSH<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=16 title=dsh>DSH<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" data-position=2 title=embedding>EMBEDDING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/fiber/ class="post_tag button button_translucent" data-position=1 title=fiber>FIBER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" data-position=1 title=flink>FLINK<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/function-calling/ class="post_tag button button_translucent" data-position=2 title="function calling">FUNCTION CALLING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" data-position=35 title=golang>GOLANG<span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=1 title=hmr>HMR<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=3 title=hmr>HMR<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" data-position=1 title=hugo>HUGO<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=id生成>ID生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/java/ class="post_tag button button_translucent" data-position=1 title=java>JAVA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" data-position=1 title=kafka>KAFKA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" data-position=1 title=langchain>LANGCHAIN<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" data-position=1 title=loader>LOADER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/lora/ class="post_tag button button_translucent" data-position=2 title=lora>LORA<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" data-position=1 title=mcp>MCP<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/moe/ class="post_tag button button_translucent" data-position=1 title=moe>MOE<span class=button_tally>1</span>
@@ -555,17 +557,19 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" data-position=2 title=transformer>TRANSFORMER<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/websocket/ class="post_tag button button_translucent" data-position=1 title=websocket>WEBSOCKET<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" data-position=1 title=安全>安全<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%B5%8B%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=测试>测试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%AD%96%E7%95%A5%E9%92%A9%E5%AD%90/ class="post_tag button button_translucent" data-position=1 title=策略钩子>策略钩子<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=10 title=插件开发>插件开发<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=16 title=插件开发>插件开发<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%89%93%E5%8C%85/ class="post_tag button button_translucent" data-position=1 title=打包>打包<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=26 title=大模型>大模型<span class=button_tally>26</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/ class="post_tag button button_translucent" data-position=1 title=大数据>大数据<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" data-position=1 title=调度系统>调度系统<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%B0%83%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=调试>调试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/ class="post_tag button button_translucent" data-position=1 title=读书笔记>读书笔记<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=对象池>对象池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9Aagent/ class="post_tag button button_translucent" data-position=1 title=多agent>多AGENT<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9A%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=1 title=多模型>多模型<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=1 title=发布>发布<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=2 title=发布>发布<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" data-position=5 title=分布式>分布式<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/ class="post_tag button button_translucent" data-position=1 title=分布式事务>分布式事务<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/ class="post_tag button button_translucent" data-position=1 title=分库分表>分库分表<span class=button_tally>1</span>
@@ -577,6 +581,7 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C/ class="post_tag button button_translucent" data-position=1 title=服务注册>服务注册<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/ class="post_tag button button_translucent" data-position=2 title=高并发>高并发<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=高可用>高可用<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=工具调用>工具调用<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=1 title=工具开发>工具开发<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" data-position=1 title=沟通>沟通<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" data-position=1 title=后端>后端<span class=button_tally>1</span>
@@ -584,10 +589,11 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/%E7%BC%93%E5%AD%98/ class="post_tag button button_translucent" data-position=1 title=缓存>缓存<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" data-position=1 title=机器学习>机器学习<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%B0%E5%BF%86/ class="post_tag button button_translucent" data-position=1 title=记忆>记忆<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=1 title=架构>架构<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=4 title=架构>架构<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=检索增强生成>检索增强生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" data-position=2 title=可观测性>可观测性<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" data-position=1 title=可靠性>可靠性<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" data-position=1 title=客户端插件>客户端插件<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%BF%9E%E6%8E%A5%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=连接池>连接池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/ class="post_tag button button_translucent" data-position=1 title=链路追踪>链路追踪<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" data-position=1 title=逻辑>逻辑<span class=button_tally>1</span>
@@ -601,6 +607,7 @@ f. <strong>如果成功</strong>: 通知支付服务，更新订单状态。</li
 </a><a href=https://namejlt.github.io/tags/%E5%85%A5%E9%97%A8/ class="post_tag button button_translucent" data-position=1 title=入门>入门<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" data-position=5 title=设计>设计<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/ class="post_tag button button_translucent" data-position=1 title=设计模式>设计模式<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6/ class="post_tag button button_translucent" data-position=1 title=设计哲学>设计哲学<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E6%88%90%E5%BC%8Fai/ class="post_tag button button_translucent" data-position=1 title=生成式ai>生成式AI<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/ class="post_tag button button_translucent" data-position=1 title=生命周期>生命周期<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/ class="post_tag button button_translucent" data-position=1 title=时间序列>时间序列<span class=button_tally>1</span>

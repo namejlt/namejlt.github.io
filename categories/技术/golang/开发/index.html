@@ -17,14 +17,14 @@ Raft通过将一致性问 …</p><br><a href=https://namejlt.github.io/posts/tec
 </a><a href=#linkedinshare id=linkedinshare class=linkedin title="分享到 LinkedIn" rel=nofollow><svg class="icon"><title>linkedin</title><use xlink:href="#linkedin"/></svg>
 </a><a href=https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/ title="Copy Link" class="link link_yank"><svg class="icon"><title>copy</title><use xlink:href="#copy"/></svg></a></div></span></div></div><div class=excerpt_footer><div class=pale><p>Golang 依赖注入详解，深入解析 Google/Wire 在软件工程中，依赖注入 (Dependency Injection, DI) 是一种重要的设计模式，其核心思想是解耦组件之间的依赖关系。一个对象的依赖不再由其内部创建，而是由外部实体“注入”。这种控制反转 (Inversion of Control, IoC) 的模式可以显著提高代码的模块化、可测试性和可维护性。
 本文将详细讲解 Golang 中的依赖注入，深入分析 Google 开源的依赖注入工具 github.com/google/wire 的核心实现，并提供在 Golang 项目中进行依赖注入开发的实践指导。
-Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/ title=阅读更多 class="excerpt_more button">阅读更多</a></div></div></div></li><li></li></ul></div><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-008/ class=nav-link title="AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分">AI Agent-deepseek-harness插件开发008 事件系统、服务与三层能力拆分</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-007/ class=nav-link title="AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite">AI Agent-deepseek-harness插件开发007 实战二：跨会话记忆插件memory-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-006/ class=nav-link title="AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite">AI Agent-deepseek-harness插件开发006 实战一：本地知识库检索插件kb-lite</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-005/ class=nav-link title="AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约">AI Agent-deepseek-harness插件开发005 模型工具开发：defineTool五层契约</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-004/ class=nav-link title="AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机">AI Agent-deepseek-harness插件开发004 生命周期、effect与Fiber状态机</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-003/ class=nav-link title="AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制">AI Agent-deepseek-harness插件开发003 插件配置：Schemastery与层叠机制</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
+Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://namejlt.github.io/posts/tech/golang/dev/go-dep-inject/ title=阅读更多 class="excerpt_more button">阅读更多</a></div></div></div></li><li></li></ul></div><aside class=sidebar><section class=sidebar_inner><br><h2 class=mt-4>精选文章</h2><ul><li><a href=https://namejlt.github.io/posts/reading/note/book/learn-ask/ class=nav-link title=从“学会提问”掌握批判性思维>从“学会提问”掌握批判性思维</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/payment-service/ class=nav-link title=支付系统设计>支付系统设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/i18n-system/ class=nav-link title=通用多语言（i18n）服务设计>通用多语言（i18n）服务设计</a></li><li><a href=https://namejlt.github.io/posts/tech/practice/backend/backend-summary/ class=nav-link title=后端常用技术总结>后端常用技术总结</a></li></ul><h2 class=mt-4>最新文章</h2><ul class=flex-column><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-016/ class=nav-link title="AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册">AI Agent-deepseek-harness插件开发016 原理篇⑥：插件开发全流程实战手册</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-015/ class=nav-link title="AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包">AI Agent-deepseek-harness插件开发015 原理篇⑤：双端插件——server、client 与动态包</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-014/ class=nav-link title="AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新">AI Agent-deepseek-harness插件开发014 原理篇④：插件加载、组合与热更新</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-013/ class=nav-link title="AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路">AI Agent-deepseek-harness插件开发013 原理篇③：主循环与工具调用链路</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-012/ class=nav-link title="AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象">AI Agent-deepseek-harness插件开发012 原理篇②：设计哲学与六个核心抽象</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-011/ class=nav-link title="AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图">AI Agent-deepseek-harness插件开发011 原理篇①：项目结构与目录职责地图</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-010/ class=nav-link title="AI Agent-deepseek-harness插件开发010 打包发布与工程实践">AI Agent-deepseek-harness插件开发010 打包发布与工程实践</a></li><li><a href=https://namejlt.github.io/posts/tech/ai/agent/deepseek-harness-dev-009/ class=nav-link title="AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务">AI Agent-deepseek-harness插件开发009 安全策略钩子与后台任务</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>分类</h2><nav class=tags_nav><a href=https://namejlt.github.io/categories/%E9%98%85%E8%AF%BB/%E7%AC%94%E8%AE%B0/%E9%97%AE%E9%A2%98/ class="post_tag button button_translucent" title=阅读/笔记/问题>阅读/笔记/问题
 <span class=button_tally>35</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=技术/ai/应用开发>技术/AI/应用开发
 <span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" title=技术/实践/后端>技术/实践/后端
 <span class=button_tally>14</span>
-</a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/ai/agent/ class="post_tag button button_translucent" title=技术/ai/agent>技术/AI/AGENT
-<span class=button_tally>10</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E5%AE%9E%E8%B7%B5/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" title=技术/实践/设计>技术/实践/设计
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/deepwiki/ class="post_tag button button_translucent" title=技术/源码阅读/deepwiki>技术/源码阅读/DEEPWIKI
@@ -46,22 +46,24 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/categories/%E6%8A%80%E6%9C%AF/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/hugo/ class="post_tag button button_translucent" title=技术/源码阅读/hugo>技术/源码阅读/HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/categories/%E7%94%9F%E6%B4%BB/%E6%8A%80%E8%83%BD/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" title=生活/技能/逻辑>生活/技能/逻辑
-<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
+<span class=button_tally>1</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>标签</h2><nav class=tags_nav><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
+<span class=button_tally>39</span>
+</a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" title=golang>GOLANG
 <span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" title=ai>AI
-<span class=button_tally>33</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" title=大模型>大模型
 <span class=button_tally>26</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
+<span class=button_tally>19</span>
 </a><a href=https://namejlt.github.io/tags/%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=应用开发>应用开发
 <span class=button_tally>19</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" title=agent>AGENT
-<span class=button_tally>13</span>
 </a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" title="deepseek harness">DEEPSEEK HARNESS
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" title=dsh>DSH
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=插件开发>插件开发
-<span class=button_tally>10</span>
+<span class=button_tally>16</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
+<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" title=分布式>分布式
 <span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/ class="post_tag button button_translucent" title=源码阅读>源码阅读
@@ -76,12 +78,14 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/ class="post_tag button button_translucent" title=数据库>数据库
 <span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
+<span class=button_tally>4</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
+<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/redis/ class="post_tag button button_translucent" title=redis>REDIS
 <span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ class="post_tag button button_translucent" title=研发效能>研发效能
 <span class=button_tally>3</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" title=cordis>CORDIS
-<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" title=cursor>CURSOR
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" title=embedding>EMBEDDING
@@ -95,6 +99,8 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" title=transformer>TRANSFORMER
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" title=事件系统>事件系统
+<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" title=可观测性>可观测性
 <span class=button_tally>2</span>
@@ -114,6 +120,8 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" title=a2a>A2A
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" title="agent loop">AGENT LOOP
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" title=api网关>API网关
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" title=bm25>BM25
@@ -126,8 +134,6 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" title=flink>FLINK
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" title=hmr>HMR
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" title=hugo>HUGO
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=id生成>ID生成
@@ -137,6 +143,8 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" title=kafka>KAFKA
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" title=langchain>LANGCHAIN
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" title=loader>LOADER
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" title=mcp>MCP
 <span class=button_tally>1</span>
@@ -172,8 +180,6 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E7%89%87/ class="post_tag button button_translucent" title=分片>分片
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=发布>发布
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" title=可靠性>可靠性
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/ class="post_tag button button_translucent" title=后台任务>后台任务
@@ -190,9 +196,13 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" title=安全>安全
 <span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" title=客户端插件>客户端插件
+<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" title=对象池>对象池
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" title=工具开发>工具开发
+<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" title=工具调用>工具调用
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B9%B3%E6%BB%91%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" title=平滑发布>平滑发布
 <span class=button_tally>1</span>
@@ -230,44 +240,36 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" title=机器学习>机器学习
 <span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" title=架构>架构
-<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" title=检索增强生成>检索增强生成
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E7%BC%96%E6%8E%92/ class="post_tag button button_translucent" title=模型编排>模型编排
 <span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/ class="post_tag button button_translucent" title=模型评估>模型评估
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" title=沟通>沟通
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/ class="post_tag button button_translucent" title=注意力机制>注意力机制
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/ class="post_tag button button_translucent" title=消息队列>消息队列
-<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%B8%B8%E6%88%8F/ class="post_tag button button_translucent" title=游戏>游戏
 <span class=button_tally>1</span></a><br><div class="post_tags_toggle button">所有标签</div><div class=post_tags><div class=tags_list><a href=https://namejlt.github.io/tags/a2a/ class="post_tag button button_translucent" data-position=1 title=a2a>A2A<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=13 title=agent>AGENT<span class=button_tally>13</span>
-</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=33 title=ai>AI<span class=button_tally>33</span>
+</a><a href=https://namejlt.github.io/tags/agent/ class="post_tag button button_translucent" data-position=19 title=agent>AGENT<span class=button_tally>19</span>
+</a><a href=https://namejlt.github.io/tags/agent-loop/ class="post_tag button button_translucent" data-position=1 title="agent loop">AGENT LOOP<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/ai/ class="post_tag button button_translucent" data-position=39 title=ai>AI<span class=button_tally>39</span>
 </a><a href=https://namejlt.github.io/tags/api%E7%BD%91%E5%85%B3/ class="post_tag button button_translucent" data-position=1 title=api网关>API网关<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/bm25/ class="post_tag button button_translucent" data-position=1 title=bm25>BM25<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=2 title=cordis>CORDIS<span class=button_tally>2</span>
+</a><a href=https://namejlt.github.io/tags/cordis/ class="post_tag button button_translucent" data-position=5 title=cordis>CORDIS<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/cursor/ class="post_tag button button_translucent" data-position=2 title=cursor>CURSOR<span class=button_tally>2</span>
-</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=10 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/deepseek-harness/ class="post_tag button button_translucent" data-position=16 title="deepseek harness">DEEPSEEK HARNESS<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/deepwiki/ class="post_tag button button_translucent" data-position=4 title=deepwiki>DEEPWIKI<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/definetool/ class="post_tag button button_translucent" data-position=1 title=definetool>DEFINETOOL<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/docker/ class="post_tag button button_translucent" data-position=1 title=docker>DOCKER<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=10 title=dsh>DSH<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/dsh/ class="post_tag button button_translucent" data-position=16 title=dsh>DSH<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/embedding/ class="post_tag button button_translucent" data-position=2 title=embedding>EMBEDDING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/fiber/ class="post_tag button button_translucent" data-position=1 title=fiber>FIBER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/flink/ class="post_tag button button_translucent" data-position=1 title=flink>FLINK<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/function-calling/ class="post_tag button button_translucent" data-position=2 title="function calling">FUNCTION CALLING<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/golang/ class="post_tag button button_translucent" data-position=35 title=golang>GOLANG<span class=button_tally>35</span>
-</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=1 title=hmr>HMR<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/hmr/ class="post_tag button button_translucent" data-position=3 title=hmr>HMR<span class=button_tally>3</span>
 </a><a href=https://namejlt.github.io/tags/hugo/ class="post_tag button button_translucent" data-position=1 title=hugo>HUGO<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/id%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=id生成>ID生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/java/ class="post_tag button button_translucent" data-position=1 title=java>JAVA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/kafka/ class="post_tag button button_translucent" data-position=1 title=kafka>KAFKA<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/langchain/ class="post_tag button button_translucent" data-position=1 title=langchain>LANGCHAIN<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/loader/ class="post_tag button button_translucent" data-position=1 title=loader>LOADER<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/lora/ class="post_tag button button_translucent" data-position=2 title=lora>LORA<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/mcp/ class="post_tag button button_translucent" data-position=1 title=mcp>MCP<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/moe/ class="post_tag button button_translucent" data-position=1 title=moe>MOE<span class=button_tally>1</span>
@@ -282,17 +284,19 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/transformer/ class="post_tag button button_translucent" data-position=2 title=transformer>TRANSFORMER<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/websocket/ class="post_tag button button_translucent" data-position=1 title=websocket>WEBSOCKET<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AE%89%E5%85%A8/ class="post_tag button button_translucent" data-position=1 title=安全>安全<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%B5%8B%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=测试>测试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%AD%96%E7%95%A5%E9%92%A9%E5%AD%90/ class="post_tag button button_translucent" data-position=1 title=策略钩子>策略钩子<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=10 title=插件开发>插件开发<span class=button_tally>10</span>
+</a><a href=https://namejlt.github.io/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=16 title=插件开发>插件开发<span class=button_tally>16</span>
 </a><a href=https://namejlt.github.io/tags/%E6%89%93%E5%8C%85/ class="post_tag button button_translucent" data-position=1 title=打包>打包<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=26 title=大模型>大模型<span class=button_tally>26</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/ class="post_tag button button_translucent" data-position=1 title=大数据>大数据<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F/ class="post_tag button button_translucent" data-position=1 title=调度系统>调度系统<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%B0%83%E8%AF%95/ class="post_tag button button_translucent" data-position=1 title=调试>调试<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/ class="post_tag button button_translucent" data-position=1 title=读书笔记>读书笔记<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%AF%B9%E8%B1%A1%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=对象池>对象池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9Aagent/ class="post_tag button button_translucent" data-position=1 title=多agent>多AGENT<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%A4%9A%E6%A8%A1%E5%9E%8B/ class="post_tag button button_translucent" data-position=1 title=多模型>多模型<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=1 title=发布>发布<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%8F%91%E5%B8%83/ class="post_tag button button_translucent" data-position=2 title=发布>发布<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/ class="post_tag button button_translucent" data-position=5 title=分布式>分布式<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/ class="post_tag button button_translucent" data-position=1 title=分布式事务>分布式事务<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/ class="post_tag button button_translucent" data-position=1 title=分库分表>分库分表<span class=button_tally>1</span>
@@ -304,6 +308,7 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C/ class="post_tag button button_translucent" data-position=1 title=服务注册>服务注册<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/ class="post_tag button button_translucent" data-position=2 title=高并发>高并发<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=高可用>高可用<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ class="post_tag button button_translucent" data-position=1 title=工具调用>工具调用<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/ class="post_tag button button_translucent" data-position=1 title=工具开发>工具开发<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%B2%9F%E9%80%9A/ class="post_tag button button_translucent" data-position=1 title=沟通>沟通<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%90%8E%E7%AB%AF/ class="post_tag button button_translucent" data-position=1 title=后端>后端<span class=button_tally>1</span>
@@ -311,10 +316,11 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/%E7%BC%93%E5%AD%98/ class="post_tag button button_translucent" data-position=1 title=缓存>缓存<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ class="post_tag button button_translucent" data-position=1 title=机器学习>机器学习<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%B0%E5%BF%86/ class="post_tag button button_translucent" data-position=1 title=记忆>记忆<span class=button_tally>1</span>
-</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=1 title=架构>架构<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E6%9E%B6%E6%9E%84/ class="post_tag button button_translucent" data-position=4 title=架构>架构<span class=button_tally>4</span>
 </a><a href=https://namejlt.github.io/tags/%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90/ class="post_tag button button_translucent" data-position=1 title=检索增强生成>检索增强生成<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/ class="post_tag button button_translucent" data-position=2 title=可观测性>可观测性<span class=button_tally>2</span>
 </a><a href=https://namejlt.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/ class="post_tag button button_translucent" data-position=1 title=可靠性>可靠性<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%8F%92%E4%BB%B6/ class="post_tag button button_translucent" data-position=1 title=客户端插件>客户端插件<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%BF%9E%E6%8E%A5%E6%B1%A0/ class="post_tag button button_translucent" data-position=1 title=连接池>连接池<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/ class="post_tag button button_translucent" data-position=1 title=链路追踪>链路追踪<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E9%80%BB%E8%BE%91/ class="post_tag button button_translucent" data-position=1 title=逻辑>逻辑<span class=button_tally>1</span>
@@ -328,6 +334,7 @@ Golang 中的依赖注入 在 Golang 中，依赖注 …</p><br><a href=https://
 </a><a href=https://namejlt.github.io/tags/%E5%85%A5%E9%97%A8/ class="post_tag button button_translucent" data-position=1 title=入门>入门<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1/ class="post_tag button button_translucent" data-position=5 title=设计>设计<span class=button_tally>5</span>
 </a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/ class="post_tag button button_translucent" data-position=1 title=设计模式>设计模式<span class=button_tally>1</span>
+</a><a href=https://namejlt.github.io/tags/%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6/ class="post_tag button button_translucent" data-position=1 title=设计哲学>设计哲学<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E6%88%90%E5%BC%8Fai/ class="post_tag button button_translucent" data-position=1 title=生成式ai>生成式AI<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/ class="post_tag button button_translucent" data-position=1 title=生命周期>生命周期<span class=button_tally>1</span>
 </a><a href=https://namejlt.github.io/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/ class="post_tag button button_translucent" data-position=1 title=时间序列>时间序列<span class=button_tally>1</span>
